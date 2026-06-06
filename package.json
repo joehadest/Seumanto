@@ -1,0 +1,12 @@
+{
+  "name": "maykeloja",
+  "version": "2.0.0",
+  "private": true,
+  "description": "E-commerce de camisetas (Loja + Admin) com Supabase (Postgres + Realtime).",
+  "scripts": {
+    "postinstall": "npm --prefix client install",
+    "dev": "npm --prefix client run dev",
+    "build": "npm --prefix client run build",
+    "preview": "npm --prefix client run preview"
+  }
+}

@@ -1,0 +1,124 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;1,14..32,400&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: "Inter", system-ui, sans-serif;
+    @apply bg-white text-neutral-900 antialiased;
+  }
+
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-neutral-200;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-neutral-300;
+  }
+
+  ::selection {
+    @apply bg-yellow-100 text-neutral-900;
+  }
+}
+
+@layer components {
+  /* Skeleton loader */
+  .skeleton {
+    background: linear-gradient(90deg, #f3f4f6 0%, #e9eaec 50%, #f3f4f6 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-xl bg-yellow-400 px-5 py-2.5 text-sm font-semibold text-neutral-900
+           transition-all duration-200 hover:bg-yellow-500 active:scale-[0.97]
+           disabled:cursor-not-allowed disabled:opacity-40;
+  }
+  .btn-accent {
+    @apply inline-flex items-center justify-center rounded-xl bg-yellow-400 px-5 py-2.5 text-sm font-semibold text-neutral-900
+           transition-all duration-200 hover:bg-yellow-500 active:scale-[0.97]
+           disabled:cursor-not-allowed disabled:opacity-40;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center rounded-xl border border-neutral-200 bg-white px-5 py-2.5 text-sm font-semibold text-neutral-700
+           transition-all duration-200 hover:bg-neutral-50 active:scale-[0.97];
+  }
+
+  /* Input */
+  .input-field {
+    @apply w-full rounded-xl border border-neutral-200 bg-white px-3.5 py-2.5 text-sm text-neutral-900
+           placeholder:text-neutral-400 transition-colors
+           focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-200;
+  }
+
+  /* Card */
+  .card {
+    @apply rounded-2xl border border-neutral-100 bg-white shadow-card;
+  }
+}
+
+/* Page-level fade-in (applied to each page root) */
+.page-enter {
+  animation: fadeIn 0.35s ease forwards;
+}
+
+@keyframes footerMarquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes footerBreathe {
+  0% {
+    transform: translate(-50%, -50%) scale(0.96);
+    opacity: 0.55;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.08);
+    opacity: 0.9;
+  }
+}
+
+@keyframes footerHeartbeat {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.2);
+  }
+  55% {
+    transform: scale(1);
+  }
+  75% {
+    transform: scale(1.14);
+  }
+}
+
+.animate-footer-marquee {
+  animation: footerMarquee 36s linear infinite;
+}
+
+.animate-footer-breathe {
+  animation: footerBreathe 7s ease-in-out infinite alternate;
+}
+
+.animate-footer-heartbeat {
+  animation: footerHeartbeat 2.2s ease-in-out infinite;
+}
