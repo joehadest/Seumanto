@@ -165,8 +165,11 @@ acessos.
 
 ## Mercado Pago (Checkout Pro)
 
-O checkout redireciona o cliente para o **Mercado Pago** (Pix e cartão). O pedido
+O checkout redireciona o cliente para o **Mercado Pago** (Pix e cartao). O pedido
 fica `Pendente` até o webhook confirmar o pagamento como `Pago`.
+
+Para pedir as credenciais ao dono da conta Mercado Pago, use o arquivo
+`MERCADO_PAGO_CLIENTE.md`.
 
 ### 1. Aplicar migration
 
@@ -177,12 +180,12 @@ Execute no SQL Editor do Supabase:
 ### 2. Deploy das Edge Functions
 
 ```bash
-supabase login
-supabase link --project-ref SEU_PROJECT_REF
-supabase secrets set MERCADO_PAGO_ACCESS_TOKEN=APP_USR-...
-supabase secrets set SITE_URL=https://seumanto.webpulseservicos.com
-supabase functions deploy create-mp-checkout
-supabase functions deploy mercado-pago-webhook
+npx supabase login
+npx supabase link --project-ref dovscuzjxykwrzapalkv
+npx supabase secrets set MERCADO_PAGO_ACCESS_TOKEN=APP_USR-...
+npx supabase secrets set SITE_URL=https://seumanto.webpulseservicos.com
+npx supabase functions deploy create-mp-checkout
+npx supabase functions deploy mercado-pago-webhook
 ```
 
 Secrets já injetados automaticamente pelo Supabase: `SUPABASE_URL`,
@@ -190,18 +193,18 @@ Secrets já injetados automaticamente pelo Supabase: `SUPABASE_URL`,
 
 ### 3. Webhook no painel Mercado Pago
 
-Em **Suas integrações → Webhooks**, aponte para:
+Em **Suas integracoes -> Webhooks**, aponte para:
 
-`https://SEU_PROJETO.supabase.co/functions/v1/mercado-pago-webhook`
+`https://dovscuzjxykwrzapalkv.supabase.co/functions/v1/mercado-pago-webhook`
 
 Evento: **Pagamentos**.
 
 ### 4. Front-end
 
-No `client/.env`:
+No `client/.env` e nas variaveis da Vercel:
 
 ```env
-VITE_MP_SANDBOX=true   # credenciais de teste
+VITE_MP_SANDBOX=false   # credenciais reais de producao
 ```
 
 ### Fluxo
