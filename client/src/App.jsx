@@ -9,6 +9,8 @@ import Checkout from "./pages/store/Checkout.jsx";
 import PaymentResult from "./pages/store/PaymentResult.jsx";
 import LoginCliente from "./pages/store/LoginCliente.jsx";
 import CadastroCliente from "./pages/store/CadastroCliente.jsx";
+import RecuperarSenhaCliente from "./pages/store/RecuperarSenhaCliente.jsx";
+import RedefinirSenhaCliente from "./pages/store/RedefinirSenhaCliente.jsx";
 import MeusPedidos from "./pages/store/MeusPedidos.jsx";
 import MinhaConta from "./pages/store/MinhaConta.jsx";
 import CustomerRoute from "./pages/store/CustomerRoute.jsx";
@@ -137,6 +139,24 @@ export default function App() {
               <CadastroCliente />
             </StorefrontLayout>
           </MaintenanceGate>
+        }
+      />
+      <Route
+        path="/recuperar-senha"
+        element={
+          <MaintenanceGate>
+            <StorefrontLayout>
+              <RecuperarSenhaCliente />
+            </StorefrontLayout>
+          </MaintenanceGate>
+        }
+      />
+      <Route
+        path="/redefinir-senha"
+        element={
+          <StorefrontLayout>
+            <RedefinirSenhaCliente />
+          </StorefrontLayout>
         }
       />
       <Route

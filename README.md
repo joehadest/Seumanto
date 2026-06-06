@@ -118,15 +118,17 @@ O repositório já inclui `vercel.json` na raiz (build do `client/`, SPA com Rea
 ### Depois do deploy
 
 1. **Supabase → Authentication → URL Configuration**
-   - **Site URL:** `https://seu-app.vercel.app`
-   - **Redirect URLs:** `https://seu-app.vercel.app/**`
+   - **Site URL:** `https://seumanto.webpulseservicos.com`
+   - **Redirect URLs:** `https://seumanto.webpulseservicos.com/**`
+   - A recuperação de senha usa o redirect:
+     `https://seumanto.webpulseservicos.com/redefinir-senha`
 
 2. **Mercado Pago** (quando for ativar pagamentos):
    ```bash
-   supabase secrets set SITE_URL=https://seu-app.vercel.app
+   supabase secrets set SITE_URL=https://seumanto.webpulseservicos.com
    ```
 
-3. Acesse a loja em `https://seu-app.vercel.app` e o admin em `/admin/login`.
+3. Acesse a loja em `https://seumanto.webpulseservicos.com` e o admin em `/admin/login`.
 
 ## Área Admin
 
@@ -178,7 +180,7 @@ Execute no SQL Editor do Supabase:
 supabase login
 supabase link --project-ref SEU_PROJECT_REF
 supabase secrets set MERCADO_PAGO_ACCESS_TOKEN=APP_USR-...
-supabase secrets set SITE_URL=http://localhost:5173
+supabase secrets set SITE_URL=https://seumanto.webpulseservicos.com
 supabase functions deploy create-mp-checkout
 supabase functions deploy mercado-pago-webhook
 ```

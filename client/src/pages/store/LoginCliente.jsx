@@ -83,7 +83,15 @@ export default function LoginCliente() {
         </label>
 
         <label className="mt-4 block">
-          <span className="mb-1.5 block text-sm font-medium text-neutral-700">Senha</span>
+          <span className="mb-1.5 flex items-center justify-between gap-3 text-sm font-medium text-neutral-700">
+            Senha
+            <Link
+              to="/recuperar-senha"
+              className="text-xs font-semibold text-yellow-700 hover:underline"
+            >
+              Esqueci minha senha
+            </Link>
+          </span>
           <input
             type="password"
             value={password}
