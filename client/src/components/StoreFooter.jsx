@@ -6,7 +6,6 @@ const marqueeItems = [
   "Camisetas essenciais",
   "Seu manto",
   "Conforto todos os dias",
-  "Amarelo e branco",
   "Modelagem minimalista",
 ];
 
@@ -43,7 +42,16 @@ function FooterPill({ children, className = "", to, href, ...props }) {
   );
 }
 
-export default function StoreFooter() {
+export default function StoreFooter({ settings }) {
+  const footerEmailText =
+    settings?.contactInfo?.email?.trim() ||
+    settings?.contactInfo?.footerEmailText?.trim() ||
+    "contato@seumanto.com";
+  const footerServiceText =
+    settings?.contactInfo?.phone?.trim() ||
+    settings?.contactInfo?.footerServiceText?.trim() ||
+    "Atendimento online";
+
   function scrollToTop() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -114,11 +122,11 @@ export default function StoreFooter() {
         <div className="mt-10 grid w-full max-w-2xl gap-3 text-left text-sm text-neutral-500 sm:grid-cols-2">
           <div className="rounded-2xl border border-neutral-100 bg-white/80 p-4 shadow-sm">
             <Mail className="mb-2 h-4 w-4 text-yellow-600" />
-            contato@seumanto.com
+            {footerEmailText}
           </div>
           <div className="rounded-2xl border border-neutral-100 bg-white/80 p-4 shadow-sm">
             <Phone className="mb-2 h-4 w-4 text-yellow-600" />
-            Atendimento online
+            {footerServiceText}
           </div>
         </div>
       </div>

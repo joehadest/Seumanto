@@ -5,17 +5,18 @@ import {
   KeyRound,
   Lock,
   Mail,
-  MapPin,
   Phone,
   Save,
   Settings,
   ShieldCheck,
+  Sparkles,
   Store,
   Truck,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../../lib/supabase.js";
 import { useStoreSettings } from "../../hooks/useStoreSettings.js";
+import { useProducts } from "../../hooks/useProducts.js";
 import { formatBRL } from "../../utils/format.js";
 
 const EMPTY_FORM = {
@@ -23,7 +24,7 @@ const EMPTY_FORM = {
   maintenanceMode: false,
   contactEmail: "",
   contactPhone: "",
-  contactAddress: "",
+  featuredProductIds: [],
   freeShippingMinAmount: "",
   flatRate: "",
 };
@@ -31,6 +32,7 @@ const EMPTY_FORM = {
 export default function SettingsAdmin() {
   const navigate = useNavigate();
   const { settings, loading, error, saveSettings } = useStoreSettings();
+  const { products, loading: productsLoading } = useProducts();
   const [form, setForm] = useState(EMPTY_FORM);
   const [account, setAccount] = useState({
     currentEmail: "",
@@ -66,9 +68,11 @@ export default function SettingsAdmin() {
     setForm({
       storeName: settings.storeName ?? "Seu manto",
       maintenanceMode: Boolean(settings.maintenanceMode),
-      contactEmail: settings.contactInfo?.email ?? "",
-      contactPhone: settings.contactInfo?.phone ?? "",
-      contactAddress: settings.contactInfo?.address ?? "",
+      contactEmail:
+        settings.contactInfo?.email ?? settings.contactInfo?.footerEmailText ?? "",
+      contactPhone:
+        settings.contactInfo?.phone ?? settings.contactInfo?.footerServiceText ?? "",
+      featuredProductIds: settings.featuredProductIds ?? [],
       freeShippingMinAmount: settings.shippingRules?.freeShippingMinAmount ?? "",
       flatRate: settings.shippingRules?.flatRate ?? "",
     });
@@ -80,6 +84,25 @@ export default function SettingsAdmin() {
 
   function updateAccountField(field, value) {
     setAccount((prev) => ({ ...prev, [field]: value }));
+  }
+
+  function toggleFeaturedProduct(productId) {
+    setForm((prev) => {
+      const current = prev.featuredProductIds ?? [];
+      const isSelected = current.includes(productId);
+
+      if (isSelected) {
+        return {
+          ...prev,
+          featuredProductIds: current.filter((id) => id !== productId),
+        };
+      }
+
+      return {
+        ...prev,
+        featuredProductIds: [...current, productId].slice(0, 6),
+      };
+    });
   }
 
   async function handleSubmit(e) {
@@ -100,8 +123,8 @@ export default function SettingsAdmin() {
         contactInfo: {
           email: form.contactEmail,
           phone: form.contactPhone,
-          address: form.contactAddress,
         },
+        featuredProductIds: form.featuredProductIds,
         shippingRules: {
           freeShippingMinAmount: Number(form.freeShippingMinAmount) || 0,
           flatRate: Number(form.flatRate) || 0,
@@ -272,38 +295,104 @@ export default function SettingsAdmin() {
 
           <SettingsSection
             icon={Mail}
-            title="Contato público"
-            description="Essas informações aparecem no rodapé e ajudam o cliente a falar com a loja."
+            title="Cards do footer"
+            description="Edite os dois textos exibidos nos cards de contato do rodapé da loja."
           >
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field icon={Mail} label="E-mail">
+              <Field icon={Mail} label="Card de contato">
                 <input
-                  type="email"
                   value={form.contactEmail}
                   onChange={(e) => updateField("contactEmail", e.target.value)}
                   className="input-field"
                   placeholder="contato@seumanto.com"
                 />
               </Field>
-              <Field icon={Phone} label="Telefone">
+              <Field icon={Phone} label="Card de atendimento">
                 <input
                   value={form.contactPhone}
                   onChange={(e) => updateField("contactPhone", e.target.value)}
                   className="input-field"
-                  placeholder="(11) 99999-9999"
+                  placeholder="Atendimento online"
                 />
               </Field>
             </div>
-            <div className="mt-4">
-              <Field icon={MapPin} label="Endereço">
-                <input
-                  value={form.contactAddress}
-                  onChange={(e) => updateField("contactAddress", e.target.value)}
-                  className="input-field"
-                  placeholder="Rua, número, bairro, cidade - UF"
-                />
-              </Field>
-            </div>
+          </SettingsSection>
+
+          <SettingsSection
+            icon={Sparkles}
+            title="Produtos em destaque"
+            description="Escolha até 6 produtos para aparecerem no carrossel logo abaixo do hero da loja."
+          >
+            {productsLoading ? (
+              <div className="grid gap-3 sm:grid-cols-2">
+                {Array.from({ length: 4 }).map((_, index) => (
+                  <div key={index} className="skeleton h-24 rounded-2xl" />
+                ))}
+              </div>
+            ) : products.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-neutral-200 bg-neutral-50 p-5 text-sm text-neutral-500">
+                Nenhum produto cadastrado ainda. Enquanto isso, a loja mostra exemplos no carrossel.
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between gap-3 rounded-2xl bg-yellow-50 px-4 py-3 text-sm">
+                  <span className="font-bold text-neutral-700">
+                    {form.featuredProductIds.length} de 6 selecionados
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => updateField("featuredProductIds", [])}
+                    className="font-bold text-yellow-700 hover:text-yellow-800"
+                  >
+                    Limpar seleção
+                  </button>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {products.map((product) => {
+                    const selected = form.featuredProductIds.includes(product._id);
+                    const disabled = !selected && form.featuredProductIds.length >= 6;
+
+                    return (
+                      <button
+                        key={product._id}
+                        type="button"
+                        onClick={() => toggleFeaturedProduct(product._id)}
+                        disabled={disabled}
+                        className={`flex min-w-0 items-center gap-3 rounded-2xl border p-3 text-left transition ${
+                          selected
+                            ? "border-yellow-300 bg-yellow-50 ring-2 ring-yellow-100"
+                            : "border-neutral-100 bg-white hover:border-yellow-200 hover:bg-yellow-50/50"
+                        } ${disabled ? "cursor-not-allowed opacity-50" : ""}`}
+                      >
+                        <img
+                          src={product.imageUrl || "/logo.png"}
+                          alt={product.name}
+                          className="h-16 w-16 shrink-0 rounded-xl object-cover"
+                        />
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate text-sm font-black text-neutral-950">
+                            {product.name}
+                          </span>
+                          <span className="mt-0.5 block text-xs font-bold text-yellow-700">
+                            {formatBRL(product.price)}
+                          </span>
+                        </span>
+                        <span
+                          className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border ${
+                            selected
+                              ? "border-yellow-400 bg-yellow-400 text-neutral-950"
+                              : "border-neutral-200 text-transparent"
+                          }`}
+                        >
+                          <CheckCircle2 className="h-4 w-4" />
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </SettingsSection>
 
           <SettingsSection
@@ -374,8 +463,16 @@ export default function SettingsAdmin() {
 
             <dl className="space-y-3 p-5 text-sm">
               <SummaryRow label="Loja" value={form.storeName || "-"} />
-              <SummaryRow label="E-mail" value={form.contactEmail || "-"} />
-              <SummaryRow label="Telefone" value={form.contactPhone || "-"} />
+              <SummaryRow label="Card contato" value={form.contactEmail || "-"} />
+              <SummaryRow label="Card atendimento" value={form.contactPhone || "-"} />
+              <SummaryRow
+                label="Destaques"
+                value={
+                  form.featuredProductIds.length
+                    ? `${form.featuredProductIds.length} produto(s)`
+                    : "Exemplos automáticos"
+                }
+              />
               <SummaryRow label="Frete fixo" value={formatBRL(Number(form.flatRate) || 0)} />
               <SummaryRow
                 label="Frete grátis"
@@ -549,9 +646,18 @@ function StorePreview({ form }) {
       </div>
 
       <div className="space-y-3 p-5 text-sm">
-        <PreviewLine icon={Mail} text={form.contactEmail || "E-mail não informado"} />
-        <PreviewLine icon={Phone} text={form.contactPhone || "Telefone não informado"} />
-        <PreviewLine icon={MapPin} text={form.contactAddress || "Endereço não informado"} />
+        <div className="grid gap-2 sm:grid-cols-2">
+          <PreviewLine icon={Mail} text={form.contactEmail || "contato@seumanto.com"} />
+          <PreviewLine icon={Phone} text={form.contactPhone || "Atendimento online"} />
+        </div>
+        <PreviewLine
+          icon={Sparkles}
+          text={
+            form.featuredProductIds.length
+              ? `${form.featuredProductIds.length} destaque(s) no carrossel`
+              : "Carrossel com exemplos automáticos"
+          }
+        />
         <div className="rounded-2xl bg-yellow-50 p-4">
           <p className="text-xs font-black uppercase tracking-wider text-yellow-700">Frete</p>
           <p className="mt-1 font-bold text-neutral-900">

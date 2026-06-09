@@ -23,25 +23,23 @@ import SettingsAdmin from "./pages/admin/SettingsAdmin.jsx";
 import ProtectedRoute from "./pages/admin/ProtectedRoute.jsx";
 import { useStoreSettings } from "./hooks/useStoreSettings.js";
 
-function StorefrontLayout({ children }) {
+function StorefrontLayout({ children, settings }) {
   return (
     <div className="relative min-h-screen bg-white">
       <div className="relative z-10">
         <Navbar />
         <main className="mx-auto max-w-6xl px-4 py-6">{children}</main>
-        <StoreFooter />
+        <StoreFooter settings={settings} />
         <FloatingCart />
       </div>
     </div>
   );
 }
 
-function MaintenanceGate({ children }) {
-  const { settings, loading } = useStoreSettings();
-
+function MaintenanceGate({ children, settings, loading }) {
   if (!loading && settings?.maintenanceMode) {
     return (
-      <StorefrontLayout>
+      <StorefrontLayout settings={settings}>
         <div className="mx-auto max-w-md rounded-2xl border border-neutral-100 bg-white p-8 text-center shadow-card animate-fade-in">
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-yellow-50 text-yellow-600">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-7 w-7">
@@ -62,6 +60,21 @@ function MaintenanceGate({ children }) {
   return children;
 }
 
+function StorefrontPage({ children, maintenance = true }) {
+  const { settings, loading } = useStoreSettings();
+  const content =
+    typeof children === "function" ? children({ settings, loading }) : children;
+  const page = <StorefrontLayout settings={settings}>{content}</StorefrontLayout>;
+
+  if (!maintenance) return page;
+
+  return (
+    <MaintenanceGate settings={settings} loading={loading}>
+      {page}
+    </MaintenanceGate>
+  );
+}
+
 export default function App() {
   return (
     <>
@@ -70,117 +83,101 @@ export default function App() {
       <Route
         path="/"
         element={
-          <MaintenanceGate>
-            <StorefrontLayout>
-              <Catalog />
-            </StorefrontLayout>
-          </MaintenanceGate>
+          <StorefrontPage>
+            {({ settings }) => <Catalog settings={settings} />}
+          </StorefrontPage>
         }
       />
       <Route
         path="/carrinho"
         element={
-          <MaintenanceGate>
-            <StorefrontLayout>
-              <Cart />
-            </StorefrontLayout>
-          </MaintenanceGate>
+          <StorefrontPage>
+            <Cart />
+          </StorefrontPage>
         }
       />
       <Route
         path="/checkout"
         element={
-          <MaintenanceGate>
-            <StorefrontLayout>
-              <Checkout />
-            </StorefrontLayout>
-          </MaintenanceGate>
+          <StorefrontPage>
+            <Checkout />
+          </StorefrontPage>
         }
       />
       <Route
         path="/checkout/sucesso"
         element={
-          <StorefrontLayout>
+          <StorefrontPage maintenance={false}>
             <PaymentResult variant="sucesso" />
-          </StorefrontLayout>
+          </StorefrontPage>
         }
       />
       <Route
         path="/checkout/pendente"
         element={
-          <StorefrontLayout>
+          <StorefrontPage maintenance={false}>
             <PaymentResult variant="pendente" />
-          </StorefrontLayout>
+          </StorefrontPage>
         }
       />
       <Route
         path="/checkout/erro"
         element={
-          <StorefrontLayout>
+          <StorefrontPage maintenance={false}>
             <PaymentResult variant="erro" />
-          </StorefrontLayout>
+          </StorefrontPage>
         }
       />
       <Route
         path="/login"
         element={
-          <MaintenanceGate>
-            <StorefrontLayout>
-              <LoginCliente />
-            </StorefrontLayout>
-          </MaintenanceGate>
+          <StorefrontPage>
+            <LoginCliente />
+          </StorefrontPage>
         }
       />
       <Route
         path="/cadastro"
         element={
-          <MaintenanceGate>
-            <StorefrontLayout>
-              <CadastroCliente />
-            </StorefrontLayout>
-          </MaintenanceGate>
+          <StorefrontPage>
+            <CadastroCliente />
+          </StorefrontPage>
         }
       />
       <Route
         path="/recuperar-senha"
         element={
-          <MaintenanceGate>
-            <StorefrontLayout>
-              <RecuperarSenhaCliente />
-            </StorefrontLayout>
-          </MaintenanceGate>
+          <StorefrontPage>
+            <RecuperarSenhaCliente />
+          </StorefrontPage>
         }
       />
       <Route
         path="/redefinir-senha"
         element={
-          <StorefrontLayout>
+          <StorefrontPage maintenance={false}>
             <RedefinirSenhaCliente />
-          </StorefrontLayout>
+          </StorefrontPage>
         }
       />
       <Route
         path="/meus-pedidos"
         element={
-          <MaintenanceGate>
-            <StorefrontLayout>
-              <CustomerRoute>
-                <MeusPedidos />
-              </CustomerRoute>
-            </StorefrontLayout>
-          </MaintenanceGate>
+          <StorefrontPage>
+            <CustomerRoute>
+              <MeusPedidos />
+            </CustomerRoute>
+          </StorefrontPage>
         }
       />
       <Route
         path="/minha-conta"
         element={
-          <MaintenanceGate>
-            <StorefrontLayout>
-              <CustomerRoute>
-                <MinhaConta />
-              </CustomerRoute>
-            </StorefrontLayout>
-          </MaintenanceGate>
+          <StorefrontPage>
+            <CustomerRoute>
+              <MinhaConta />
+            </CustomerRoute>
+          </StorefrontPage>
         }
       />
 

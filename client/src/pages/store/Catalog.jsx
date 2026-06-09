@@ -5,6 +5,7 @@ import { productReviewsApi } from "../../api/productReviews.js";
 import { useProducts } from "../../hooks/useProducts.js";
 import { useCart } from "../../context/CartContext.jsx";
 import { formatBRL } from "../../utils/format.js";
+import InteractiveSelector from "../../components/ui/interactive-selector.jsx";
 
 const StoreHero = lazy(() => import("../../components/StoreHero.jsx"));
 
@@ -65,7 +66,7 @@ function SkeletonCard() {
   );
 }
 
-export default function Catalog() {
+export default function Catalog({ settings }) {
   const { products, loading, error } = useProducts();
   const { addItem } = useCart();
 
@@ -83,6 +84,14 @@ export default function Catalog() {
     return list;
   }, [products, sizeFilter, maxPrice, sort]);
 
+  const featuredProducts = useMemo(() => {
+    const ids = settings?.featuredProductIds ?? [];
+    if (!ids.length) return [];
+
+    const byId = new Map(products.map((product) => [product._id, product]));
+    return ids.map((id) => byId.get(id)).filter(Boolean);
+  }, [products, settings?.featuredProductIds]);
+
   const hasFilters = sizeFilter || maxPrice;
 
   return (
@@ -90,6 +99,11 @@ export default function Catalog() {
       <Suspense fallback={<HeroFallback />}>
         <StoreHero productCount={products.length} loading={loading} />
       </Suspense>
+
+      <InteractiveSelector
+        items={featuredProducts}
+        onSelect={featuredProducts.length ? setSelectedProduct : undefined}
+      />
 
       {/* Filters */}
       <div id="colecao" className="card mb-8 scroll-mt-24 p-4 transition-shadow duration-300 hover:shadow-card-hover">
