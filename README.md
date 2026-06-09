@@ -28,6 +28,7 @@ maykeloja/
 │   └── migrations/           # migrations SQL do banco Supabase
 ├── client/                   # React + Vite + Tailwind
 │   ├── .env.example          # VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY
+│   ├── public/favicon/       # ícones e manifest da loja
 │   └── src/
 │       ├── lib/supabase.js   # cria o client do Supabase
 │       ├── api/              # adapter Postgres <-> front (products, orders)
