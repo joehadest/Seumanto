@@ -28,6 +28,9 @@ client/.env.*.local
 !.env.example
 !client/.env.example
 
+# Documentos operacionais locais
+MERCADO_PAGO_CLIENTE.md
+
 # Logs
 *.log
 npm-debug.log*
