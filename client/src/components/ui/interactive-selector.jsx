@@ -8,37 +8,42 @@ export const FEATURED_PRODUCT_EXAMPLES = [
   {
     _id: "sample-1",
     name: "Manto Essential Preto",
-    description: "Camiseta minimalista para qualquer combinação.",
+    category: "Camisetas",
+    description: "Peça minimalista para qualquer combinação.",
     price: 99.9,
     imageUrl: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=900&q=80",
   },
   {
     _id: "sample-2",
-    name: "Manto Off White",
-    description: "Visual limpo com toque premium no dia a dia.",
-    price: 109.9,
-    imageUrl: "https://images.unsplash.com/photo-1503341504253-dff4815485f1?auto=format&fit=crop&w=900&q=80",
+    name: "Boné Classic",
+    category: "Bonés",
+    description: "Acessório fácil para fechar o visual.",
+    price: 69.9,
+    imageUrl: "https://images.unsplash.com/photo-1521369909029-2afed882baee?auto=format&fit=crop&w=900&q=80",
   },
   {
     _id: "sample-3",
     name: "Oversized Urban",
+    category: "Camisetas",
     description: "Modelagem solta, presença forte e conforto.",
     price: 129.9,
     imageUrl: "https://images.unsplash.com/photo-1562157873-818bc0726f68?auto=format&fit=crop&w=900&q=80",
   },
   {
     _id: "sample-4",
-    name: "Drop Amarelo",
-    description: "Peça de destaque para quem gosta de atitude.",
+    name: "Short Street",
+    category: "Shorts",
+    description: "Conforto para compor looks leves.",
     price: 119.9,
-    imageUrl: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=900&q=80",
+    imageUrl: "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=900&q=80",
   },
   {
     _id: "sample-5",
-    name: "Classic Logo",
-    description: "A camiseta fácil de usar em todos os momentos.",
-    price: 89.9,
-    imageUrl: "https://images.unsplash.com/photo-1583743814966-8936f37f4678?auto=format&fit=crop&w=900&q=80",
+    name: "Ecobag Seu Manto",
+    category: "Acessórios",
+    description: "Acessório prático para o dia a dia.",
+    price: 49.9,
+    imageUrl: "https://images.unsplash.com/photo-1597481499750-3e6b22637e12?auto=format&fit=crop&w=900&q=80",
   },
 ];
 
@@ -98,6 +103,7 @@ export default function InteractiveSelector({
           {safeItems.map((item, index) => {
             const isActive = activeIndex === index;
             const Icon = FALLBACK_ICONS[index % FALLBACK_ICONS.length];
+            const coverImage = item.imageUrls?.[0] ?? item.imageUrl;
 
             return (
               <button
@@ -118,7 +124,7 @@ export default function InteractiveSelector({
                 aria-label={`Ver ${item.name}`}
               >
                 <img
-                  src={item.imageUrl || "/logo.png"}
+                  src={coverImage || "/logo.png"}
                   alt={item.name}
                   className={`absolute inset-0 h-full w-full object-cover transition duration-700 ${
                     isActive ? "scale-100" : "scale-110 grayscale-[25%]"

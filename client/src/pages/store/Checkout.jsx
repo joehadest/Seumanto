@@ -75,6 +75,7 @@ export default function Checkout() {
         items: items.map((i) => ({
           productId: i.productId,
           name: i.name,
+          category: i.category,
           size: i.size,
           color: i.color,
           price: i.price,

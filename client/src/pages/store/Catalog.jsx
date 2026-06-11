@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { AnimatePresence, LayoutGroup, motion } from "framer-motion";
-import { Check, Heart, Loader2, MessageCircle, ShoppingCart, Star, X } from "lucide-react";
+import { Check, Heart, Loader2, MessageCircle, ShoppingCart, Star, Tag, X } from "lucide-react";
 import { productReviewsApi } from "../../api/productReviews.js";
 import { useProducts } from "../../hooks/useProducts.js";
 import { useCart } from "../../context/CartContext.jsx";
@@ -71,18 +71,28 @@ export default function Catalog({ settings }) {
   const { addItem } = useCart();
 
   const [sizeFilter, setSizeFilter] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   const [sort, setSort] = useState("recent");
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   const filtered = useMemo(() => {
     let list = [...products];
+    if (categoryFilter) {
+      list = list.filter((p) => (p.category || "Camisetas") === categoryFilter);
+    }
     if (sizeFilter) list = list.filter((p) => p.sizes?.includes(sizeFilter));
     if (maxPrice) list = list.filter((p) => p.price <= Number(maxPrice));
     if (sort === "price-asc") list.sort((a, b) => a.price - b.price);
     if (sort === "price-desc") list.sort((a, b) => b.price - a.price);
     return list;
-  }, [products, sizeFilter, maxPrice, sort]);
+  }, [products, categoryFilter, sizeFilter, maxPrice, sort]);
+
+  const categories = useMemo(() => {
+    return [...new Set(products.map((product) => product.category || "Camisetas"))].sort(
+      (a, b) => a.localeCompare(b, "pt-BR")
+    );
+  }, [products]);
 
   const featuredProducts = useMemo(() => {
     const ids = settings?.featuredProductIds ?? [];
@@ -92,7 +102,7 @@ export default function Catalog({ settings }) {
     return ids.map((id) => byId.get(id)).filter(Boolean);
   }, [products, settings?.featuredProductIds]);
 
-  const hasFilters = sizeFilter || maxPrice;
+  const hasFilters = categoryFilter || sizeFilter || maxPrice;
 
   return (
     <div className="animate-fade-in">
@@ -108,6 +118,25 @@ export default function Catalog({ settings }) {
       {/* Filters */}
       <div id="colecao" className="card mb-8 scroll-mt-24 p-4 transition-shadow duration-300 hover:shadow-card-hover">
         <div className="flex flex-wrap items-end gap-5">
+          {/* Size pills */}
+          <div>
+            <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-neutral-400">
+              Categoria
+            </p>
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+              className="input-field w-44"
+            >
+              <option value="">Todas</option>
+              {categories.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
+          </div>
+
           {/* Size pills */}
           <div>
             <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-neutral-400">
@@ -179,6 +208,7 @@ export default function Catalog({ settings }) {
           {hasFilters && (
             <button
               onClick={() => {
+                setCategoryFilter("");
                 setSizeFilter("");
                 setMaxPrice("");
               }}
@@ -223,7 +253,7 @@ export default function Catalog({ settings }) {
           className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-neutral-200 bg-white py-16 text-center"
         >
           <span className="mb-3 text-5xl">👕</span>
-          <p className="font-semibold text-neutral-700">Nenhuma camiseta encontrada</p>
+          <p className="font-semibold text-neutral-700">Nenhum produto encontrado</p>
           <p className="mt-1 text-sm text-neutral-400">Tente ajustar os filtros acima</p>
         </motion.div>
       ) : (
@@ -262,7 +292,11 @@ function ProductCard({ product, onDetails, animDelay = 0 }) {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const outOfStock = product.stock <= 0;
   const lowStock = product.stock > 0 && product.stock <= 5;
-  const images = product.imageUrl ? [product.imageUrl] : [];
+  const images = product.imageUrls?.length
+    ? product.imageUrls
+    : product.imageUrl
+    ? [product.imageUrl]
+    : [];
   const rating = 4.8;
   const reviewCount = Math.max(12, product.stock + 18);
 
@@ -299,8 +333,9 @@ function ProductCard({ product, onDetails, animDelay = 0 }) {
         )}
 
         <div className="absolute left-3 top-3 flex flex-col gap-2">
-          <div className="rounded-full bg-yellow-400 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-neutral-900 shadow-sm">
-            Seu manto
+          <div className="inline-flex items-center gap-1 rounded-full bg-yellow-400 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-neutral-900 shadow-sm">
+            <Tag className="h-3 w-3" />
+            {product.category || "Camisetas"}
           </div>
           {lowStock && (
             <div className="rounded-full bg-amber-500 px-2.5 py-1 text-[11px] font-bold text-white shadow-sm">
@@ -376,6 +411,12 @@ function ProductCard({ product, onDetails, animDelay = 0 }) {
 }
 
 function ProductDetailsModal({ product, onClose, onAdd }) {
+  const images = product.imageUrls?.length
+    ? product.imageUrls
+    : product.imageUrl
+    ? [product.imageUrl]
+    : [];
+  const [selectedImage, setSelectedImage] = useState(images[0] ?? "");
   const [size, setSize] = useState(product.sizes?.[0] ?? "");
   const [color, setColor] = useState(product.colors?.[0] ?? "");
   const [quantity, setQuantity] = useState(1);
@@ -424,6 +465,10 @@ function ProductDetailsModal({ product, onClose, onAdd }) {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [onClose, product._id]);
+
+  useEffect(() => {
+    setSelectedImage(images[0] ?? "");
+  }, [product._id]);
 
   const averageRating = reviews.length
     ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
@@ -488,9 +533,9 @@ function ProductDetailsModal({ product, onClose, onAdd }) {
           <div className="grid gap-0 lg:grid-cols-[1.08fr_0.92fr]">
             <div className="bg-neutral-50 p-4 md:p-6">
               <div className="overflow-hidden rounded-2xl border border-neutral-100 bg-white">
-                {product.imageUrl ? (
+                {selectedImage ? (
                   <img
-                    src={product.imageUrl}
+                    src={selectedImage}
                     alt={product.name}
                     className="aspect-[4/5] w-full object-cover"
                   />
@@ -500,11 +545,35 @@ function ProductDetailsModal({ product, onClose, onAdd }) {
                   </div>
                 )}
               </div>
+              {images.length > 1 && (
+                <div className="mt-3 grid grid-cols-5 gap-2">
+                  {images.map((imageUrl, index) => (
+                    <button
+                      key={`${imageUrl}-${index}`}
+                      type="button"
+                      onClick={() => setSelectedImage(imageUrl)}
+                      className={`overflow-hidden rounded-xl border bg-white transition ${
+                        selectedImage === imageUrl
+                          ? "border-yellow-400 ring-2 ring-yellow-100"
+                          : "border-neutral-100 hover:border-yellow-200"
+                      }`}
+                      aria-label={`Ver imagem ${index + 1} de ${product.name}`}
+                    >
+                      <img
+                        src={imageUrl}
+                        alt=""
+                        className="aspect-square w-full object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="p-5 md:p-7">
-              <div className="mb-3 inline-flex rounded-full bg-yellow-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-yellow-700">
-                Produto Seu manto
+              <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-yellow-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-yellow-700">
+                <Tag className="h-3.5 w-3.5" />
+                {product.category || "Produto"}
               </div>
 
               <h2 className="text-2xl font-bold leading-tight text-neutral-950 md:text-3xl">
@@ -532,7 +601,7 @@ function ProductDetailsModal({ product, onClose, onAdd }) {
                   {formatBRL(product.price)}
                 </p>
                 <p className="mt-1 text-sm text-neutral-500">
-                  Pagamento 100% seguro. Separe seu manto antes que acabe.
+                  Pagamento 100% seguro. Separe seu produto antes que acabe.
                 </p>
               </div>
 

@@ -11,19 +11,22 @@ import {
   Save,
   Search,
   Shirt,
+  Tag,
   Trash2,
   X,
 } from "lucide-react";
 import { useProducts } from "../../hooks/useProducts.js";
+import { useProductCategories } from "../../hooks/useProductCategories.js";
 import { formatBRL } from "../../utils/format.js";
 
 const ALL_SIZES = ["P", "M", "G", "GG"];
 const EMPTY_FORM = {
   name: "",
+  category: "Camisetas",
   description: "",
   price: "",
   stock: "",
-  imageUrl: "",
+  imageUrls: [""],
   sizes: [],
   colors: "",
 };
@@ -46,9 +49,15 @@ function colorToHex(color) {
   return COLOR_MAP[String(color).toLowerCase().trim()] ?? "#facc15";
 }
 
+function cleanImageUrls(value) {
+  const urls = Array.isArray(value) ? value : [value];
+  return [...new Set(urls.map((url) => String(url ?? "").trim()).filter(Boolean))];
+}
+
 export default function ProductsAdmin() {
   const { products, loading, error, createProduct, updateProduct, removeProduct } =
     useProducts();
+  const { categories, error: categoriesError } = useProductCategories();
 
   const [form, setForm] = useState(EMPTY_FORM);
   const [editingId, setEditingId] = useState(null);
@@ -66,6 +75,7 @@ export default function ProductsAdmin() {
     return {
       total: products.length,
       totalStock,
+      categories: new Set(products.map((product) => product.category || "Camisetas")).size,
       lowStock: products.filter((product) => product.stock > 0 && product.stock <= 5).length,
       outOfStock: products.filter((product) => product.stock === 0).length,
       inventoryValue,
@@ -77,6 +87,7 @@ export default function ProductsAdmin() {
     return products.filter((product) => {
       const searchable = [
         product.name,
+        product.category,
         product.description,
         ...(product.sizes ?? []),
         ...(product.colors ?? []),
@@ -96,19 +107,35 @@ export default function ProductsAdmin() {
     });
   }, [products, query, stockFilter]);
 
+  const categoryOptions = useMemo(() => {
+    const names = new Set([
+      ...categories.map((category) => category.name),
+      ...products.map((product) => product.category || "Camisetas"),
+      "Camisetas",
+    ]);
+
+    return [...names]
+      .filter(Boolean)
+      .sort((a, b) => a.localeCompare(b, "pt-BR"));
+  }, [categories, products]);
+
   const formColors = useMemo(
     () => form.colors.split(",").map((color) => color.trim()).filter(Boolean),
     [form.colors]
   );
+  const formImageUrls = useMemo(() => cleanImageUrls(form.imageUrls), [form.imageUrls]);
+  const previewImageUrl = formImageUrls[0] ?? "";
 
   function startEdit(product) {
     setEditingId(product._id);
     setForm({
       name: product.name ?? "",
+      category: product.category ?? "Camisetas",
       description: product.description ?? "",
       price: product.price ?? "",
       stock: product.stock ?? "",
-      imageUrl: product.imageUrl ?? "",
+      imageUrls: (product.imageUrls?.length ? product.imageUrls : [product.imageUrl])
+        .filter(Boolean),
       sizes: product.sizes ?? [],
       colors: (product.colors ?? []).join(", "),
     });
@@ -130,20 +157,47 @@ export default function ProductsAdmin() {
     }));
   }
 
+  function updateImageUrl(index, value) {
+    setForm((prev) => ({
+      ...prev,
+      imageUrls: prev.imageUrls.map((url, currentIndex) =>
+        currentIndex === index ? value : url
+      ),
+    }));
+  }
+
+  function addImageUrl() {
+    setForm((prev) => ({
+      ...prev,
+      imageUrls: [...prev.imageUrls, ""],
+    }));
+  }
+
+  function removeImageUrl(index) {
+    setForm((prev) => {
+      const next = prev.imageUrls.filter((_, currentIndex) => currentIndex !== index);
+      return {
+        ...prev,
+        imageUrls: next.length ? next : [""],
+      };
+    });
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
     if (!form.name.trim()) {
-      setFormError("Informe o nome da camiseta.");
+      setFormError("Informe o nome do produto.");
       return;
     }
     setSaving(true);
     setFormError(null);
     const payload = {
       name: form.name,
+      category: form.category,
       description: form.description,
       price: Number(form.price) || 0,
       stock: Number(form.stock) || 0,
-      imageUrl: form.imageUrl,
+      imageUrls: formImageUrls,
       sizes: form.sizes,
       colors: form.colors,
     };
@@ -159,7 +213,7 @@ export default function ProductsAdmin() {
   }
 
   async function handleDelete(id) {
-    if (!confirm("Excluir esta camiseta? Esta ação não pode ser desfeita.")) return;
+    if (!confirm("Excluir este produto? Esta ação não pode ser desfeita.")) return;
     try {
       await removeProduct(id);
     } catch (err) {
@@ -177,7 +231,7 @@ export default function ProductsAdmin() {
             </p>
             <h1 className="mt-1 text-3xl font-black tracking-tight text-neutral-950">Produtos</h1>
             <p className="mt-1 text-sm text-neutral-500">
-              Cadastre, organize e acompanhe o estoque das camisetas da loja.
+              Cadastre, organize e acompanhe todos os tipos de produtos da loja.
             </p>
           </div>
           <button
@@ -190,8 +244,9 @@ export default function ProductsAdmin() {
           </button>
         </div>
 
-        <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+        <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
           <MetricCard icon={Shirt} label="Produtos" value={metrics.total} />
+          <MetricCard icon={Tag} label="Categorias" value={metrics.categories} />
           <MetricCard icon={Package} label="Peças em estoque" value={metrics.totalStock} />
           <MetricCard icon={AlertTriangle} label="Estoque baixo" value={metrics.lowStock} />
           <MetricCard icon={X} label="Esgotados" value={metrics.outOfStock} />
@@ -208,7 +263,7 @@ export default function ProductsAdmin() {
                   {editingId ? "Modo edição" : "Cadastro"}
                 </p>
                 <h2 className="mt-1 text-xl font-black text-neutral-950">
-                  {editingId ? "Editar camiseta" : "Nova camiseta"}
+                  {editingId ? "Editar produto" : "Novo produto"}
                 </h2>
               </div>
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-yellow-400 text-neutral-950 shadow-sm">
@@ -220,9 +275,9 @@ export default function ProductsAdmin() {
           <div className="p-5">
             <div className="mb-5 overflow-hidden rounded-2xl border border-neutral-100 bg-neutral-50">
               <div className="aspect-[16/10] bg-white">
-                {form.imageUrl ? (
+                {previewImageUrl ? (
                   <img
-                    src={form.imageUrl}
+                    src={previewImageUrl}
                     alt="Prévia do produto"
                     className="h-full w-full object-cover"
                     onError={(e) => (e.currentTarget.style.display = "none")}
@@ -259,13 +314,76 @@ export default function ProductsAdmin() {
                 />
               </FormField>
 
-              <FormField icon={Image} label="URL da imagem">
-                <input
-                  value={form.imageUrl}
-                  onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-                  placeholder="https://..."
+              <FormField icon={Tag} label="Categoria">
+                <select
+                  value={form.category}
+                  onChange={(e) => setForm({ ...form, category: e.target.value })}
                   className="input-field"
-                />
+                >
+                  {categoryOptions.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
+                {categoriesError && (
+                  <p className="mt-1 text-xs text-amber-600">
+                    Cadastre categorias na aba Categorias após aplicar a migration.
+                  </p>
+                )}
+              </FormField>
+
+              <FormField icon={Image} label="Imagens do produto">
+                <div className="space-y-2">
+                  {form.imageUrls.map((url, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-neutral-50 ring-1 ring-neutral-100">
+                        {url.trim() ? (
+                          <img
+                            key={`${url}-${index}`}
+                            src={url}
+                            alt={`Prévia ${index + 1}`}
+                            className="h-full w-full object-cover"
+                            onError={(event) => {
+                              event.currentTarget.style.display = "none";
+                            }}
+                          />
+                        ) : (
+                          <Image className="h-5 w-5 text-neutral-300" />
+                        )}
+                      </div>
+                      <input
+                        value={url}
+                        onChange={(event) => updateImageUrl(index, event.target.value)}
+                        placeholder={
+                          index === 0
+                            ? "URL da imagem principal"
+                            : `URL da imagem ${index + 1}`
+                        }
+                        className="input-field"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImageUrl(index)}
+                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-red-100 text-red-500 transition-colors hover:bg-red-50"
+                        title="Remover imagem"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-1 text-xs text-neutral-400">
+                  A primeira imagem será usada como capa do produto.
+                </p>
+                <button
+                  type="button"
+                  onClick={addImageUrl}
+                  className="mt-2 inline-flex items-center gap-2 rounded-xl border border-yellow-100 bg-yellow-50 px-3 py-2 text-xs font-black text-yellow-700 transition-colors hover:bg-yellow-100"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  Adicionar imagem
+                </button>
               </FormField>
 
               <FormField label="Descrição">
@@ -373,7 +491,7 @@ export default function ProductsAdmin() {
                 <input
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Buscar por nome, descrição, cor ou tamanho..."
+                  placeholder="Buscar por nome, categoria, descrição, cor ou tamanho..."
                   className="input-field pl-9"
                 />
               </label>
@@ -440,6 +558,7 @@ export default function ProductsAdmin() {
 function ProductAdminCard({ product, onEdit, onDelete }) {
   const stockState =
     product.stock === 0 ? "esgotado" : product.stock <= 5 ? "baixo" : "disponivel";
+  const imageCount = product.imageUrls?.length ?? (product.imageUrl ? 1 : 0);
 
   return (
     <article className="group overflow-hidden rounded-[1.5rem] border border-neutral-100 bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-card-hover">
@@ -454,6 +573,11 @@ function ProductAdminCard({ product, onEdit, onDelete }) {
         <div className="absolute left-3 top-3">
           <StockBadge stock={product.stock} state={stockState} />
         </div>
+        {imageCount > 1 && (
+          <div className="absolute bottom-3 left-3 rounded-full bg-white/90 px-2.5 py-1 text-xs font-black text-neutral-700 shadow-sm">
+            {imageCount} imagens
+          </div>
+        )}
         <div className="absolute right-3 top-3 flex gap-2 opacity-0 transition-opacity group-hover:opacity-100">
           <button
             type="button"
@@ -477,6 +601,9 @@ function ProductAdminCard({ product, onEdit, onDelete }) {
       <div className="p-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
+            <p className="mb-1 inline-flex rounded-full bg-yellow-50 px-2 py-0.5 text-[11px] font-black uppercase tracking-wide text-yellow-700">
+              {product.category || "Camisetas"}
+            </p>
             <h3 className="truncate font-black text-neutral-950">{product.name}</h3>
             <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-neutral-400">
               {product.description || "Sem descrição cadastrada."}

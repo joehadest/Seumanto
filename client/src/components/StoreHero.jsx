@@ -35,8 +35,8 @@ export default function StoreHero({ productCount = 0, loading = false }) {
           transition={{ duration: 0.8, delay: 0.6 }}
           className="mt-6 max-w-xl text-lg leading-relaxed text-neutral-600"
         >
-          Camisetas essenciais, modelagem confortável e visual minimalista para
-          vestir o seu dia a dia com a cara da{" "}
+          Produtos essenciais, conforto e visual minimalista para
+          acompanhar o seu dia a dia com a cara da{" "}
           <span className="font-semibold text-neutral-900">Seu manto</span>.
         </motion.p>
 

@@ -17,6 +17,7 @@ import CustomerRoute from "./pages/store/CustomerRoute.jsx";
 import Login from "./pages/admin/Login.jsx";
 import AdminLayout from "./pages/admin/AdminLayout.jsx";
 import ProductsAdmin from "./pages/admin/ProductsAdmin.jsx";
+import CategoriesAdmin from "./pages/admin/CategoriesAdmin.jsx";
 import OrdersAdmin from "./pages/admin/OrdersAdmin.jsx";
 import ReviewsAdmin from "./pages/admin/ReviewsAdmin.jsx";
 import SettingsAdmin from "./pages/admin/SettingsAdmin.jsx";
@@ -192,6 +193,7 @@ export default function App() {
       >
         <Route index element={<Navigate to="/admin/produtos" replace />} />
         <Route path="produtos" element={<ProductsAdmin />} />
+        <Route path="categorias" element={<CategoriesAdmin />} />
         <Route path="pedidos" element={<OrdersAdmin />} />
         <Route path="avaliacoes" element={<ReviewsAdmin />} />
         <Route path="configuracoes" element={<SettingsAdmin />} />

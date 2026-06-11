@@ -3,7 +3,7 @@ import { ArrowUp, Mail, Phone, ShoppingBag } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const marqueeItems = [
-  "Camisetas essenciais",
+  "Produtos essenciais",
   "Seu manto",
   "Conforto todos os dias",
   "Modelagem minimalista",
@@ -102,7 +102,7 @@ export default function StoreFooter({ settings }) {
           transition={{ duration: 0.6, delay: 0.1 }}
           className="mt-4 max-w-xl text-sm leading-relaxed text-neutral-500 md:text-base"
         >
-          Camisetas essenciais com identidade limpa, conforto e presença para o dia a dia.
+          Produtos com identidade limpa, conforto e presença para o dia a dia.
         </motion.p>
 
         <div className="mt-8 flex flex-wrap justify-center gap-3">

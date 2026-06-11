@@ -5,15 +5,19 @@ const TABLE = "products";
 // Mapeia a linha do Postgres (snake_case + id) para o formato usado no front
 // (_id + camelCase). Mantem hooks/telas inalterados.
 export function productFromRow(row) {
+  const imageUrls = normalizeImageUrls(row.image_urls, row.image_url);
+
   return {
     _id: row.id,
     name: row.name,
+    category: row.category || "Camisetas",
     description: row.description,
     price: Number(row.price),
     sizes: row.sizes ?? [],
     colors: row.colors ?? [],
     stock: row.stock,
-    imageUrl: row.image_url,
+    imageUrl: imageUrls[0] ?? "",
+    imageUrls,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -24,13 +28,27 @@ const ALLOWED_SIZES = ["P", "M", "G", "GG"];
 function toRow(data) {
   const row = {};
   if (data.name !== undefined) row.name = String(data.name).trim();
+  if (data.category !== undefined) row.category = String(data.category).trim() || "Camisetas";
   if (data.description !== undefined) row.description = String(data.description).trim();
   if (data.price !== undefined) row.price = Number(data.price) || 0;
   if (data.stock !== undefined) row.stock = Number(data.stock) || 0;
-  if (data.imageUrl !== undefined) row.image_url = String(data.imageUrl).trim();
+  if (data.imageUrls !== undefined || data.imageUrl !== undefined) {
+    const imageUrls = normalizeImageUrls(data.imageUrls, data.imageUrl);
+    row.image_urls = imageUrls;
+    row.image_url = imageUrls[0] ?? "";
+  }
   if (data.sizes !== undefined) row.sizes = toArray(data.sizes).filter((s) => ALLOWED_SIZES.includes(s));
   if (data.colors !== undefined) row.colors = toArray(data.colors);
   return row;
+}
+
+function normalizeImageUrls(value, fallback = "") {
+  const urls = toArray(value);
+  if (urls.length > 0) return [...new Set(urls)].filter(Boolean);
+
+  const fallbackUrl = String(fallback ?? "").trim();
+  if (fallbackUrl) urls.unshift(fallbackUrl);
+  return [...new Set(urls)].filter(Boolean);
 }
 
 function toArray(value) {

@@ -3,6 +3,7 @@ import { supabase } from "../../lib/supabase.js";
 
 const links = [
   { to: "/admin/produtos", label: "Produtos" },
+  { to: "/admin/categorias", label: "Categorias" },
   { to: "/admin/pedidos", label: "Pedidos" },
   { to: "/admin/avaliacoes", label: "Avaliações" },
   { to: "/admin/configuracoes", label: "Configuracoes" },

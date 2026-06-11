@@ -36,7 +36,7 @@ maykeloja/
 │       ├── context/          # CartContext (carrinho do cliente)
 │       ├── components/       # Navbar
 │       ├── pages/store/      # Catalog, Cart, Checkout
-│       └── pages/admin/      # Login, layout admin, Products, Orders, Settings
+│       └── pages/admin/      # Login, layout admin, Products, Categories, Orders, Settings
 ```
 
 ## Modelo de dados (Postgres)
@@ -47,14 +47,27 @@ maykeloja/
 | ----------- | --------------- |
 | id          | uuid (PK)       |
 | name        | text            |
+| category    | text            |
 | description | text            |
 | price       | numeric(10,2)   |
 | sizes       | text[]          |
 | colors      | text[]          |
 | stock       | integer         |
 | image_url   | text            |
+| image_urls  | text[]          |
 | created_at  | timestamptz     |
 | updated_at  | timestamptz     |
+
+**Tabela `product_categories`**
+
+| coluna      | tipo        |
+| ----------- | ----------- |
+| id          | uuid (PK)   |
+| name        | text unique |
+| description | text        |
+| sort_order  | integer     |
+| created_at  | timestamptz |
+| updated_at  | timestamptz |
 
 **Tabela `orders`**
 
@@ -62,7 +75,7 @@ maykeloja/
 | ---------- | ------------------------------------------------------- |
 | id         | uuid (PK)                                               |
 | customer   | jsonb `{ name, email, phone, address }`                 |
-| items      | jsonb `[{ productId, name, size, color, price, quantity }]` |
+| items      | jsonb `[{ productId, name, category, size, color, price, quantity }]` |
 | total      | numeric(10,2)                                           |
 | status     | text (`Pendente`/`Pago`/`Enviado`/`Cancelado`)          |
 | created_at | timestamptz                                             |
@@ -137,8 +150,8 @@ O painel administrativo é isolado da loja pública:
 
 - Não há links públicos para o Admin na Navbar da loja.
 - O acesso é pela URL direta `http://localhost:5173/admin/login`.
-- Rotas internas ficam em `/admin/produtos`, `/admin/pedidos` e
-  `/admin/configuracoes`.
+- Rotas internas ficam em `/admin/produtos`, `/admin/categorias`,
+  `/admin/pedidos`, `/admin/avaliacoes` e `/admin/configuracoes`.
 - `ProtectedRoute` bloqueia qualquer renderização interna se não houver sessão
   Supabase Auth com role admin.
 

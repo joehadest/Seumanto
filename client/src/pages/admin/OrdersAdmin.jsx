@@ -253,9 +253,11 @@ export default function OrdersAdmin() {
                           <p className="font-semibold text-neutral-800">
                             <span className="text-neutral-400">{item.quantity}×</span> {item.name}
                           </p>
-                          {(item.size || item.color) && (
+                          {(item.category || item.size || item.color) && (
                             <p className="mt-0.5 text-xs text-neutral-400">
-                              {[item.size && `Tam. ${item.size}`, item.color].filter(Boolean).join(" · ")}
+                              {[item.category, item.size && `Tam. ${item.size}`, item.color]
+                                .filter(Boolean)
+                                .join(" · ")}
                             </p>
                           )}
                         </div>

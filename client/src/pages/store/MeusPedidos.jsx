@@ -119,7 +119,7 @@ export default function MeusPedidos() {
           <p className="font-semibold text-neutral-700">Você ainda não fez pedidos</p>
           <p className="mt-1 text-sm text-neutral-400">Quando finalizar uma compra, ela aparecerá aqui.</p>
           <Link to="/" className="btn-primary mt-5">
-            Ver camisetas
+            Ver produtos
           </Link>
         </div>
       ) : (
@@ -154,9 +154,9 @@ export default function MeusPedidos() {
                     <div key={`${item.productId}-${index}`} className="flex justify-between gap-3 text-sm">
                       <span className="text-neutral-600">
                         {item.quantity}x {item.name}
-                        {(item.size || item.color) && (
+                        {(item.category || item.size || item.color) && (
                           <span className="text-neutral-400">
-                            {" "}({[item.size, item.color].filter(Boolean).join(", ")})
+                            {" "}({[item.category, item.size, item.color].filter(Boolean).join(", ")})
                           </span>
                         )}
                       </span>
