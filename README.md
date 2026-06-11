@@ -48,6 +48,7 @@ maykeloja/
 | id          | uuid (PK)       |
 | name        | text            |
 | category    | text            |
+| categories  | text[]          |
 | description | text            |
 | price       | numeric(10,2)   |
 | sizes       | text[]          |
@@ -75,7 +76,7 @@ maykeloja/
 | ---------- | ------------------------------------------------------- |
 | id         | uuid (PK)                                               |
 | customer   | jsonb `{ name, email, phone, address }`                 |
-| items      | jsonb `[{ productId, name, category, size, color, price, quantity }]` |
+| items      | jsonb `[{ productId, name, category, categories, size, color, price, quantity }]` |
 | total      | numeric(10,2)                                           |
 | status     | text (`Pendente`/`Pago`/`Enviado`/`Cancelado`)          |
 | created_at | timestamptz                                             |

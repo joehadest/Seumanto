@@ -154,9 +154,17 @@ export default function MeusPedidos() {
                     <div key={`${item.productId}-${index}`} className="flex justify-between gap-3 text-sm">
                       <span className="text-neutral-600">
                         {item.quantity}x {item.name}
-                        {(item.category || item.size || item.color) && (
+                        {(item.categories?.length || item.category || item.size || item.color) && (
                           <span className="text-neutral-400">
-                            {" "}({[item.category, item.size, item.color].filter(Boolean).join(", ")})
+                            {" "}({
+                              [
+                                ...(item.categories?.length ? item.categories : [item.category]).filter(Boolean),
+                                item.size,
+                                item.color,
+                              ]
+                                .filter(Boolean)
+                                .join(", ")
+                            })
                           </span>
                         )}
                       </span>

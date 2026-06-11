@@ -22,7 +22,7 @@ import { formatBRL } from "../../utils/format.js";
 const ALL_SIZES = ["P", "M", "G", "GG"];
 const EMPTY_FORM = {
   name: "",
-  category: "Camisetas",
+  categories: ["Camisetas"],
   description: "",
   price: "",
   stock: "",
@@ -75,7 +75,9 @@ export default function ProductsAdmin() {
     return {
       total: products.length,
       totalStock,
-      categories: new Set(products.map((product) => product.category || "Camisetas")).size,
+      categories: new Set(
+        products.flatMap((product) => product.categories?.length ? product.categories : [product.category || "Camisetas"])
+      ).size,
       lowStock: products.filter((product) => product.stock > 0 && product.stock <= 5).length,
       outOfStock: products.filter((product) => product.stock === 0).length,
       inventoryValue,
@@ -87,7 +89,7 @@ export default function ProductsAdmin() {
     return products.filter((product) => {
       const searchable = [
         product.name,
-        product.category,
+        ...(product.categories?.length ? product.categories : [product.category]),
         product.description,
         ...(product.sizes ?? []),
         ...(product.colors ?? []),
@@ -110,7 +112,9 @@ export default function ProductsAdmin() {
   const categoryOptions = useMemo(() => {
     const names = new Set([
       ...categories.map((category) => category.name),
-      ...products.map((product) => product.category || "Camisetas"),
+      ...products.flatMap((product) =>
+        product.categories?.length ? product.categories : [product.category || "Camisetas"]
+      ),
       "Camisetas",
     ]);
 
@@ -130,7 +134,9 @@ export default function ProductsAdmin() {
     setEditingId(product._id);
     setForm({
       name: product.name ?? "",
-      category: product.category ?? "Camisetas",
+      categories: product.categories?.length
+        ? product.categories
+        : [product.category ?? "Camisetas"],
       description: product.description ?? "",
       price: product.price ?? "",
       stock: product.stock ?? "",
@@ -155,6 +161,21 @@ export default function ProductsAdmin() {
         ? prev.sizes.filter((s) => s !== size)
         : [...prev.sizes, size],
     }));
+  }
+
+  function toggleCategory(category) {
+    setForm((prev) => {
+      const current = prev.categories ?? [];
+      const selected = current.includes(category);
+      const next = selected
+        ? current.filter((item) => item !== category)
+        : [...current, category];
+
+      return {
+        ...prev,
+        categories: next.length ? next : ["Camisetas"],
+      };
+    });
   }
 
   function updateImageUrl(index, value) {
@@ -193,7 +214,7 @@ export default function ProductsAdmin() {
     setFormError(null);
     const payload = {
       name: form.name,
-      category: form.category,
+      categories: form.categories,
       description: form.description,
       price: Number(form.price) || 0,
       stock: Number(form.stock) || 0,
@@ -254,7 +275,7 @@ export default function ProductsAdmin() {
         </div>
       </section>
 
-      <div className="grid gap-6 xl:grid-cols-[410px_1fr]">
+      <div className="grid gap-6 xl:grid-cols-[410px_1fr] 2xl:grid-cols-[440px_1fr] min-[1800px]:grid-cols-[470px_1fr]">
         <form onSubmit={handleSubmit} className="h-fit overflow-hidden rounded-[1.75rem] border border-neutral-100 bg-white shadow-card">
           <div className="border-b border-neutral-100 bg-neutral-50/80 p-5">
             <div className="flex items-center justify-between gap-3">
@@ -314,18 +335,26 @@ export default function ProductsAdmin() {
                 />
               </FormField>
 
-              <FormField icon={Tag} label="Categoria">
-                <select
-                  value={form.category}
-                  onChange={(e) => setForm({ ...form, category: e.target.value })}
-                  className="input-field"
-                >
+              <FormField icon={Tag} label="Categorias">
+                <div className="flex flex-wrap gap-2">
                   {categoryOptions.map((category) => (
-                    <option key={category} value={category}>
+                    <button
+                      key={category}
+                      type="button"
+                      onClick={() => toggleCategory(category)}
+                      className={`rounded-full px-3 py-2 text-xs font-black transition-all ${
+                        form.categories.includes(category)
+                          ? "bg-yellow-400 text-neutral-950 shadow-sm ring-2 ring-yellow-100"
+                          : "border border-neutral-200 bg-white text-neutral-600 hover:border-yellow-300 hover:bg-yellow-50"
+                      }`}
+                    >
                       {category}
-                    </option>
+                    </button>
                   ))}
-                </select>
+                </div>
+                <p className="mt-1 text-xs text-neutral-400">
+                  Selecione todas as categorias que ajudam o cliente a encontrar o produto.
+                </p>
                 {categoriesError && (
                   <p className="mt-1 text-xs text-amber-600">
                     Cadastre categorias na aba Categorias após aplicar a migration.
@@ -524,7 +553,7 @@ export default function ProductsAdmin() {
           )}
 
           {loading ? (
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-3 min-[1800px]:grid-cols-4">
               {[1, 2, 3, 4].map((i) => (
                 <div key={i} className="skeleton h-64 rounded-3xl" />
               ))}
@@ -538,7 +567,7 @@ export default function ProductsAdmin() {
               <p className="mt-1 text-sm text-neutral-400">Tente limpar a busca ou alterar o filtro.</p>
             </div>
           ) : (
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-3 min-[1800px]:grid-cols-4">
               {filteredProducts.map((product) => (
                 <ProductAdminCard
                   key={product._id}
@@ -559,6 +588,7 @@ function ProductAdminCard({ product, onEdit, onDelete }) {
   const stockState =
     product.stock === 0 ? "esgotado" : product.stock <= 5 ? "baixo" : "disponivel";
   const imageCount = product.imageUrls?.length ?? (product.imageUrl ? 1 : 0);
+  const categories = product.categories?.length ? product.categories : [product.category || "Camisetas"];
 
   return (
     <article className="group overflow-hidden rounded-[1.5rem] border border-neutral-100 bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-card-hover">
@@ -601,9 +631,21 @@ function ProductAdminCard({ product, onEdit, onDelete }) {
       <div className="p-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <p className="mb-1 inline-flex rounded-full bg-yellow-50 px-2 py-0.5 text-[11px] font-black uppercase tracking-wide text-yellow-700">
-              {product.category || "Camisetas"}
-            </p>
+            <div className="mb-1 flex flex-wrap gap-1">
+              {categories.slice(0, 3).map((category) => (
+                <span
+                  key={category}
+                  className="inline-flex rounded-full bg-yellow-50 px-2 py-0.5 text-[11px] font-black uppercase tracking-wide text-yellow-700"
+                >
+                  {category}
+                </span>
+              ))}
+              {categories.length > 3 && (
+                <span className="inline-flex rounded-full bg-neutral-100 px-2 py-0.5 text-[11px] font-black text-neutral-500">
+                  +{categories.length - 3}
+                </span>
+              )}
+            </div>
             <h3 className="truncate font-black text-neutral-950">{product.name}</h3>
             <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-neutral-400">
               {product.description || "Sem descrição cadastrada."}

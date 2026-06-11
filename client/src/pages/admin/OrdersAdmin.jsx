@@ -108,7 +108,7 @@ export default function OrdersAdmin() {
           </div>
         </div>
 
-        <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4 min-[1800px]:grid-cols-6">
           <MetricCard icon={ShoppingBag} label="Pedidos" value={metrics.total} />
           <MetricCard icon={Clock3} label="Pendentes" value={metrics.pending} />
           <MetricCard icon={Truck} label="Em envio" value={metrics.sent} />
@@ -117,7 +117,7 @@ export default function OrdersAdmin() {
       </div>
 
       <div className="mb-5 rounded-3xl border border-neutral-100 bg-white p-4 shadow-sm">
-        <div className="grid gap-3 lg:grid-cols-[1fr_220px]">
+        <div className="grid gap-3 lg:grid-cols-[1fr_220px] 2xl:grid-cols-[1fr_260px]">
           <label className="relative block">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
             <input
@@ -241,7 +241,7 @@ export default function OrdersAdmin() {
                 </div>
               </div>
 
-              <div className="grid gap-5 p-5 lg:grid-cols-[1fr_220px]">
+              <div className="grid gap-5 p-5 lg:grid-cols-[1fr_220px] 2xl:grid-cols-[1fr_280px]">
                 <div className="rounded-2xl border border-neutral-100 bg-neutral-50 p-4">
                   <p className="mb-3 text-xs font-black uppercase tracking-wider text-neutral-400">
                     Itens do pedido
@@ -253,9 +253,13 @@ export default function OrdersAdmin() {
                           <p className="font-semibold text-neutral-800">
                             <span className="text-neutral-400">{item.quantity}×</span> {item.name}
                           </p>
-                          {(item.category || item.size || item.color) && (
+                          {(item.categories?.length || item.category || item.size || item.color) && (
                             <p className="mt-0.5 text-xs text-neutral-400">
-                              {[item.category, item.size && `Tam. ${item.size}`, item.color]
+                              {[
+                                ...(item.categories?.length ? item.categories : [item.category]).filter(Boolean),
+                                item.size && `Tam. ${item.size}`,
+                                item.color,
+                              ]
                                 .filter(Boolean)
                                 .join(" · ")}
                             </p>

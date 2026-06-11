@@ -76,6 +76,7 @@ export default function Checkout() {
           productId: i.productId,
           name: i.name,
           category: i.category,
+          categories: i.categories,
           size: i.size,
           color: i.color,
           price: i.price,

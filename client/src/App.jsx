@@ -26,10 +26,13 @@ import { useStoreSettings } from "./hooks/useStoreSettings.js";
 
 function StorefrontLayout({ children, settings }) {
   return (
-    <div className="relative min-h-screen bg-white">
+    <div className="storefront-dark relative min-h-screen overflow-hidden bg-neutral-950 text-white">
+      <div className="pointer-events-none fixed inset-0 bg-neutral-950" />
       <div className="relative z-10">
         <Navbar />
-        <main className="mx-auto max-w-6xl px-4 py-6">{children}</main>
+        <main className="mx-auto max-w-6xl px-4 py-6 2xl:max-w-screen-2xl 2xl:px-8 min-[1800px]:max-w-[1760px]">
+          {children}
+        </main>
         <StoreFooter settings={settings} />
         <FloatingCart />
       </div>

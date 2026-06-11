@@ -134,7 +134,7 @@ export default function CategoriesAdmin() {
         </div>
       </section>
 
-      <div className="grid gap-6 xl:grid-cols-[410px_1fr]">
+      <div className="grid gap-6 xl:grid-cols-[410px_1fr] 2xl:grid-cols-[440px_1fr] min-[1800px]:grid-cols-[470px_1fr]">
         <form
           onSubmit={handleSubmit}
           className="h-fit overflow-hidden rounded-[1.75rem] border border-neutral-100 bg-white shadow-card"
@@ -230,7 +230,7 @@ export default function CategoriesAdmin() {
           </div>
 
           {loading ? (
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-3">
               {[1, 2, 3, 4].map((item) => (
                 <div key={item} className="skeleton h-40 rounded-3xl" />
               ))}
@@ -244,7 +244,7 @@ export default function CategoriesAdmin() {
               </p>
             </div>
           ) : (
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-3">
               {filteredCategories.map((category) => (
                 <article
                   key={category._id}

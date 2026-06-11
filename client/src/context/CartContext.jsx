@@ -41,6 +41,7 @@ export function CartProvider({ children }) {
           productId: product._id,
           name: product.name,
           category: product.category,
+          categories: product.categories,
           price: product.price,
           imageUrl: product.imageUrl,
           size,

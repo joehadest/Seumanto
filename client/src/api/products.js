@@ -6,11 +6,13 @@ const TABLE = "products";
 // (_id + camelCase). Mantem hooks/telas inalterados.
 export function productFromRow(row) {
   const imageUrls = normalizeImageUrls(row.image_urls, row.image_url);
+  const categories = normalizeCategories(row.categories, row.category);
 
   return {
     _id: row.id,
     name: row.name,
-    category: row.category || "Camisetas",
+    category: categories[0] || "Camisetas",
+    categories,
     description: row.description,
     price: Number(row.price),
     sizes: row.sizes ?? [],
@@ -28,7 +30,11 @@ const ALLOWED_SIZES = ["P", "M", "G", "GG"];
 function toRow(data) {
   const row = {};
   if (data.name !== undefined) row.name = String(data.name).trim();
-  if (data.category !== undefined) row.category = String(data.category).trim() || "Camisetas";
+  if (data.categories !== undefined || data.category !== undefined) {
+    const categories = normalizeCategories(data.categories, data.category);
+    row.categories = categories;
+    row.category = categories[0] || "Camisetas";
+  }
   if (data.description !== undefined) row.description = String(data.description).trim();
   if (data.price !== undefined) row.price = Number(data.price) || 0;
   if (data.stock !== undefined) row.stock = Number(data.stock) || 0;
@@ -49,6 +55,15 @@ function normalizeImageUrls(value, fallback = "") {
   const fallbackUrl = String(fallback ?? "").trim();
   if (fallbackUrl) urls.unshift(fallbackUrl);
   return [...new Set(urls)].filter(Boolean);
+}
+
+function normalizeCategories(value, fallback = "") {
+  const categories = toArray(value);
+  const fallbackCategory = String(fallback ?? "").trim();
+  if (fallbackCategory) categories.unshift(fallbackCategory);
+
+  const normalized = [...new Set(categories)].filter(Boolean);
+  return normalized.length ? normalized : ["Camisetas"];
 }
 
 function toArray(value) {

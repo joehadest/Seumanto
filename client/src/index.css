@@ -119,6 +119,236 @@
   animation: footerBreathe 7s ease-in-out infinite alternate;
 }
 
+.storefront-dark {
+  color-scheme: dark;
+}
+
+.storefront-dark main .card,
+.storefront-dark footer .card {
+  @apply border-white/10 bg-white/[0.07] text-white shadow-2xl shadow-black/25 backdrop-blur-xl;
+}
+
+.storefront-dark main .input-field {
+  @apply border-white/10 bg-white/[0.08] text-white placeholder:text-white/35 focus:border-yellow-300 focus:ring-yellow-300/20;
+}
+
+.storefront-dark main select.input-field option {
+  color: #f5f5f5;
+  background: #171717;
+}
+
+.storefront-dark main .btn-ghost,
+.storefront-dark footer .btn-ghost {
+  @apply border-white/10 bg-white/[0.08] text-white/75 hover:border-yellow-300/40 hover:bg-white/[0.12] hover:text-white;
+}
+
+.storefront-dark main .skeleton {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.13) 50%, rgba(255, 255, 255, 0.06) 100%);
+  background-size: 200% 100%;
+}
+
+.storefront-dark main .bg-white,
+.storefront-dark main .bg-neutral-50,
+.storefront-dark footer .bg-white,
+.storefront-dark footer .bg-neutral-50 {
+  background-color: rgba(255, 255, 255, 0.07);
+}
+
+.storefront-dark main .bg-neutral-100,
+.storefront-dark footer .bg-neutral-100 {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.storefront-dark main .bg-yellow-50,
+.storefront-dark footer .bg-yellow-50 {
+  background-color: rgba(250, 204, 21, 0.12);
+}
+
+.storefront-dark main .border-neutral-100,
+.storefront-dark main .border-neutral-200,
+.storefront-dark main .border-neutral-300,
+.storefront-dark footer .border-neutral-100,
+.storefront-dark footer .border-neutral-200,
+.storefront-dark footer .border-neutral-300 {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.storefront-dark main .text-neutral-950,
+.storefront-dark main .text-neutral-900,
+.storefront-dark main .text-neutral-800,
+.storefront-dark footer .text-neutral-950,
+.storefront-dark footer .text-neutral-900,
+.storefront-dark footer .text-neutral-800 {
+  color: rgba(255, 255, 255, 0.94);
+}
+
+.storefront-dark main .text-neutral-700,
+.storefront-dark main .text-neutral-600,
+.storefront-dark footer .text-neutral-700,
+.storefront-dark footer .text-neutral-600 {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.storefront-dark main .text-neutral-500,
+.storefront-dark main .text-neutral-400,
+.storefront-dark footer .text-neutral-500,
+.storefront-dark footer .text-neutral-400 {
+  color: rgba(255, 255, 255, 0.48);
+}
+
+.storefront-dark main .text-neutral-300,
+.storefront-dark footer .text-neutral-300 {
+  color: rgba(255, 255, 255, 0.34);
+}
+
+.storefront-dark main .text-yellow-700,
+.storefront-dark footer .text-yellow-700 {
+  color: #facc15;
+}
+
+.storefront-dark main .shadow-card,
+.storefront-dark footer .shadow-card {
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.32);
+}
+
+body.product-modal-open .storefront-navbar,
+body.product-modal-open .storefront-floating-cart {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-10px);
+}
+
+.admin-dark {
+  color-scheme: dark;
+}
+
+.admin-dark .card,
+.admin-dark form,
+.admin-dark article,
+.admin-dark section,
+.admin-dark aside {
+  --tw-shadow-color: rgba(0, 0, 0, 0.35);
+}
+
+.admin-dark .card,
+.admin-dark main form,
+.admin-dark main article {
+  @apply border-white/10 bg-white/[0.07] text-white shadow-2xl shadow-black/25 backdrop-blur-xl;
+}
+
+.admin-dark .input-field {
+  @apply border-white/10 bg-white/[0.08] text-white placeholder:text-white/35 focus:border-yellow-300 focus:ring-yellow-300/20;
+}
+
+.admin-dark select.input-field option {
+  color: #f5f5f5;
+  background: #171717;
+}
+
+.admin-dark .btn-ghost {
+  @apply border-white/10 bg-white/[0.08] text-white/70 hover:border-yellow-300/40 hover:bg-white/[0.12] hover:text-white;
+}
+
+.admin-dark .skeleton {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.13) 50%, rgba(255, 255, 255, 0.06) 100%);
+  background-size: 200% 100%;
+}
+
+.admin-dark main section.bg-gradient-to-br,
+.admin-dark main .bg-gradient-to-br {
+  background-image: linear-gradient(135deg, rgba(250, 204, 21, 0.14), rgba(255, 255, 255, 0.07) 45%, rgba(255, 255, 255, 0.045));
+}
+
+.admin-dark .from-yellow-50,
+.admin-dark .via-white,
+.admin-dark .to-white {
+  --tw-gradient-from: rgba(250, 204, 21, 0.14) var(--tw-gradient-from-position);
+  --tw-gradient-to: rgba(255, 255, 255, 0.045) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), rgba(255, 255, 255, 0.07) var(--tw-gradient-via-position), var(--tw-gradient-to);
+}
+
+.admin-dark .bg-white,
+.admin-dark .bg-white\/80,
+.admin-dark .bg-white\/85,
+.admin-dark .bg-white\/90,
+.admin-dark .bg-neutral-50,
+.admin-dark .bg-neutral-50\/80 {
+  background-color: rgba(255, 255, 255, 0.07);
+}
+
+.admin-dark .bg-neutral-100,
+.admin-dark .bg-neutral-100\/80 {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.admin-dark .bg-yellow-50,
+.admin-dark .bg-yellow-50\/70 {
+  background-color: rgba(250, 204, 21, 0.12);
+}
+
+.admin-dark .bg-red-50 {
+  background-color: rgba(239, 68, 68, 0.12);
+}
+
+.admin-dark .bg-emerald-50 {
+  background-color: rgba(16, 185, 129, 0.12);
+}
+
+.admin-dark .bg-amber-50 {
+  background-color: rgba(245, 158, 11, 0.12);
+}
+
+.admin-dark .border-white {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.admin-dark .border-neutral-100,
+.admin-dark .border-neutral-200,
+.admin-dark .border-neutral-300 {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.admin-dark .ring-neutral-100,
+.admin-dark .ring-neutral-200 {
+  --tw-ring-color: rgba(255, 255, 255, 0.1);
+}
+
+.admin-dark .text-neutral-950,
+.admin-dark .text-neutral-900,
+.admin-dark .text-neutral-800 {
+  color: rgba(255, 255, 255, 0.94);
+}
+
+.admin-dark .text-neutral-700,
+.admin-dark .text-neutral-600 {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.admin-dark .text-neutral-500,
+.admin-dark .text-neutral-400 {
+  color: rgba(255, 255, 255, 0.48);
+}
+
+.admin-dark .text-neutral-300 {
+  color: rgba(255, 255, 255, 0.34);
+}
+
+.admin-dark .text-yellow-700,
+.admin-dark .text-yellow-600 {
+  color: #facc15;
+}
+
+.admin-dark .shadow-card,
+.admin-dark .shadow-sm,
+.admin-dark .shadow-card-hover {
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+}
+
+.admin-dark .divide-neutral-200\/70 > :not([hidden]) ~ :not([hidden]),
+.admin-dark .divide-neutral-100 > :not([hidden]) ~ :not([hidden]) {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
 .animate-footer-heartbeat {
   animation: footerHeartbeat 2.2s ease-in-out infinite;
 }

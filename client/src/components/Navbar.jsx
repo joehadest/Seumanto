@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import { useCart } from "../context/CartContext.jsx";
 import { formatBRL } from "../utils/format.js";
+import { cn } from "../lib/utils.js";
 
 const IconBag = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-[18px] w-[18px]">
@@ -24,18 +25,37 @@ const navigationLinks = [
   { to: "/meus-pedidos", label: "Meus pedidos" },
 ];
 
+function storeLinkClass({ isActive }) {
+  return cn(
+    "rounded-full px-4 py-2 text-sm font-bold transition-all duration-200",
+    isActive
+      ? "bg-yellow-400 text-neutral-950 shadow-sm"
+      : "text-white/75 hover:bg-white/10 hover:text-white"
+  );
+}
+
 export default function Navbar() {
+  const { pathname } = useLocation();
   const { count, total } = useCart();
   const [scrolled, setScrolled] = useState(false);
   const [prevCount, setPrevCount] = useState(count);
   const [badgeAnim, setBadgeAnim] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  const isHome = pathname === "/";
+  const transparent = isHome && !scrolled && !mobileOpen;
+
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  useEffect(() => {
+    setScrolled(window.scrollY > 24);
+    setMobileOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     if (count > prevCount) {
@@ -46,31 +66,24 @@ export default function Navbar() {
     setPrevCount(count);
   }, [count, prevCount]);
 
-  const storeLink = ({ isActive }) =>
-    `rounded-full px-4 py-2 text-sm font-bold transition-all duration-200 ${
-      isActive
-        ? "bg-neutral-950 text-white shadow-sm"
-        : "text-neutral-500 hover:bg-white hover:text-neutral-950 hover:shadow-sm"
-    }`;
-
   return (
     <header
-      className={`relative z-50 overflow-hidden transition-all duration-300 ${
-        scrolled
-          ? "border-b border-yellow-100 bg-white/90 shadow-[0_14px_45px_rgba(23,23,23,0.06)] backdrop-blur-xl"
-          : "border-b border-transparent bg-white/95"
-      }`}
+      className={cn(
+        "storefront-navbar z-50 overflow-hidden text-white transition-all duration-300",
+        isHome ? "fixed inset-x-0 top-0" : "relative",
+        transparent
+          ? "border-b border-white/10 bg-neutral-950/35 backdrop-blur-md"
+          : "border-b border-white/10 bg-neutral-950/90 shadow-[0_14px_45px_rgba(0,0,0,0.35)] backdrop-blur-xl"
+      )}
     >
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-yellow-300 to-transparent" />
-      <div className="pointer-events-none absolute -right-20 -top-24 h-40 w-40 rounded-full bg-yellow-200/30 blur-3xl" />
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 2xl:max-w-screen-2xl 2xl:px-8 min-[1800px]:max-w-[1760px]">
         <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={() => setMobileOpen((open) => !open)}
             aria-expanded={mobileOpen}
             aria-label="Abrir menu"
-            className="group flex h-10 w-10 items-center justify-center rounded-full border border-yellow-100 bg-white text-neutral-900 shadow-sm transition-all hover:-translate-y-0.5 hover:bg-yellow-50 md:hidden"
+            className="group flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/10 text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-white/15 md:hidden"
           >
             <svg
               className="pointer-events-none"
@@ -101,25 +114,24 @@ export default function Navbar() {
 
           <Link
             to="/"
-            className="group flex items-center gap-3 rounded-full border border-neutral-100 bg-white/80 px-2 py-1 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+            className="group flex items-center rounded-full border border-white/15 bg-white/10 px-2 py-1 shadow-sm transition-all hover:-translate-y-0.5 hover:bg-white/15 hover:shadow-md"
             onClick={() => setMobileOpen(false)}
           >
             <img
-              src="/logo.png"
+              src="/logo-dark.svg"
               alt="Seu manto"
-              className="h-10 w-auto transition-transform duration-200 group-hover:scale-[1.03] sm:h-12"
+              className="h-11 w-auto transition-transform duration-200 group-hover:scale-[1.03] sm:h-12"
             />
-            <span
-              className="hidden pr-3 text-[22px] font-normal leading-none tracking-[-0.08em] text-neutral-950 lg:inline"
-              style={{ fontFamily: '"Trebuchet MS", "Arial Rounded MT Bold", Arial, sans-serif' }}
-            >
-              <span className="text-yellow-400">S</span>eu manto
-            </span>
           </Link>
 
-          <nav className="hidden items-center gap-1 rounded-full border border-neutral-100 bg-neutral-50/90 p-1 shadow-inner md:flex">
+          <nav className="hidden items-center gap-1 rounded-full border border-white/10 bg-white/10 p-1 backdrop-blur-sm md:flex">
             {navigationLinks.map((link) => (
-              <NavLink key={link.label} to={link.to} className={storeLink} end={link.end}>
+              <NavLink
+                key={link.label}
+                to={link.to}
+                className={storeLinkClass}
+                end={link.end}
+              >
                 {link.label}
               </NavLink>
             ))}
@@ -130,11 +142,12 @@ export default function Navbar() {
           <NavLink
             to="/minha-conta"
             className={({ isActive }) =>
-              `hidden items-center gap-2 rounded-full border px-3.5 py-2 text-sm font-bold transition-all hover:-translate-y-0.5 sm:inline-flex ${
+              cn(
+                "hidden items-center gap-2 rounded-full border px-3.5 py-2 text-sm font-bold transition-all hover:-translate-y-0.5 sm:inline-flex",
                 isActive
-                  ? "border-neutral-950 bg-neutral-950 text-white shadow-sm"
-                  : "border-neutral-100 bg-white text-neutral-700 shadow-sm hover:border-yellow-200 hover:bg-yellow-50 hover:text-neutral-950"
-              }`
+                  ? "border-yellow-300 bg-yellow-400 text-neutral-950 shadow-sm"
+                  : "border-white/15 bg-white/10 text-white hover:bg-white/15"
+              )
             }
           >
             <IconUser />
@@ -169,15 +182,15 @@ export default function Navbar() {
       </div>
 
       {mobileOpen && (
-        <div className="border-t border-yellow-100 bg-white/95 px-4 py-3 shadow-[0_18px_45px_rgba(23,23,23,0.08)] backdrop-blur-xl md:hidden">
-          <nav className="mx-auto flex max-w-6xl flex-col gap-2 rounded-3xl border border-neutral-100 bg-neutral-50 p-2">
+        <div className="border-t border-white/10 bg-neutral-950/95 px-4 py-3 backdrop-blur-xl md:hidden">
+          <nav className="mx-auto flex max-w-6xl flex-col gap-2 rounded-3xl border border-white/10 bg-white/5 p-2 2xl:max-w-screen-2xl min-[1800px]:max-w-[1760px]">
             {navigationLinks.map((link) => (
               <NavLink
                 key={link.label}
                 to={link.to}
                 end={link.end}
                 onClick={() => setMobileOpen(false)}
-                className={storeLink}
+                className={storeLinkClass}
               >
                 {link.label}
               </NavLink>
@@ -185,7 +198,7 @@ export default function Navbar() {
             <NavLink
               to="/minha-conta"
               onClick={() => setMobileOpen(false)}
-              className="flex items-center justify-between rounded-full bg-white px-4 py-2.5 text-sm font-bold text-neutral-800 shadow-sm"
+              className="flex items-center justify-between rounded-full border border-white/10 bg-white/10 px-4 py-2.5 text-sm font-bold text-white shadow-sm"
             >
               <span>Minha conta</span>
               <IconUser />

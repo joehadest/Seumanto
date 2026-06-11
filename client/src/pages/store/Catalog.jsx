@@ -3,6 +3,7 @@ import { AnimatePresence, LayoutGroup, motion } from "framer-motion";
 import { Check, Heart, Loader2, MessageCircle, ShoppingCart, Star, Tag, X } from "lucide-react";
 import { productReviewsApi } from "../../api/productReviews.js";
 import { useProducts } from "../../hooks/useProducts.js";
+import { useProductCategories } from "../../hooks/useProductCategories.js";
 import { useCart } from "../../context/CartContext.jsx";
 import { formatBRL } from "../../utils/format.js";
 import InteractiveSelector from "../../components/ui/interactive-selector.jsx";
@@ -23,6 +24,14 @@ function HeroFallback() {
 }
 
 const ALL_SIZES = ["P", "M", "G", "GG"];
+const PRODUCT_GRID_CLASS =
+  "grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 min-[1800px]:grid-cols-6";
+const PRODUCT_LAYOUT_TRANSITION = {
+  type: "spring",
+  stiffness: 260,
+  damping: 32,
+  mass: 0.55,
+};
 
 const COLOR_MAP = {
   preto: "#0f0f0f",
@@ -49,7 +58,7 @@ function getSwatchColor(name) {
 function SkeletonCard() {
   return (
     <div className="overflow-hidden rounded-2xl border border-neutral-100 bg-white">
-      <div className="skeleton aspect-[3/4]" />
+      <div className="skeleton aspect-[4/5]" />
       <div className="space-y-3 p-4">
         <div className="skeleton h-4 w-3/4 rounded-lg" />
         <div className="skeleton h-3 w-full rounded-lg" />
@@ -68,6 +77,7 @@ function SkeletonCard() {
 
 export default function Catalog({ settings }) {
   const { products, loading, error } = useProducts();
+  const { categories: productCategories } = useProductCategories();
   const { addItem } = useCart();
 
   const [sizeFilter, setSizeFilter] = useState("");
@@ -79,7 +89,11 @@ export default function Catalog({ settings }) {
   const filtered = useMemo(() => {
     let list = [...products];
     if (categoryFilter) {
-      list = list.filter((p) => (p.category || "Camisetas") === categoryFilter);
+      list = list.filter((p) =>
+        (p.categories?.length ? p.categories : [p.category || "Camisetas"]).includes(
+          categoryFilter
+        )
+      );
     }
     if (sizeFilter) list = list.filter((p) => p.sizes?.includes(sizeFilter));
     if (maxPrice) list = list.filter((p) => p.price <= Number(maxPrice));
@@ -89,10 +103,17 @@ export default function Catalog({ settings }) {
   }, [products, categoryFilter, sizeFilter, maxPrice, sort]);
 
   const categories = useMemo(() => {
-    return [...new Set(products.map((product) => product.category || "Camisetas"))].sort(
-      (a, b) => a.localeCompare(b, "pt-BR")
-    );
-  }, [products]);
+    const names = new Set([
+      ...productCategories.map((category) => category.name),
+      ...products.flatMap((product) =>
+        product.categories?.length ? product.categories : [product.category || "Camisetas"]
+      ),
+    ]);
+
+    return [...names]
+      .filter(Boolean)
+      .sort((a, b) => a.localeCompare(b, "pt-BR"));
+  }, [productCategories, products]);
 
   const featuredProducts = useMemo(() => {
     const ids = settings?.featuredProductIds ?? [];
@@ -102,12 +123,20 @@ export default function Catalog({ settings }) {
     return ids.map((id) => byId.get(id)).filter(Boolean);
   }, [products, settings?.featuredProductIds]);
 
+  const heroImages = useMemo(() => {
+    const urls = products.flatMap((product) =>
+      product.imageUrls?.length ? product.imageUrls : [product.imageUrl]
+    );
+
+    return [...new Set(urls.filter(Boolean))].slice(0, 12);
+  }, [products]);
+
   const hasFilters = categoryFilter || sizeFilter || maxPrice;
 
   return (
     <div className="animate-fade-in">
       <Suspense fallback={<HeroFallback />}>
-        <StoreHero productCount={products.length} loading={loading} />
+        <StoreHero productCount={products.length} loading={loading} images={heroImages} />
       </Suspense>
 
       <InteractiveSelector
@@ -116,30 +145,46 @@ export default function Catalog({ settings }) {
       />
 
       {/* Filters */}
-      <div id="colecao" className="card mb-8 scroll-mt-24 p-4 transition-shadow duration-300 hover:shadow-card-hover">
+      <div id="colecao" className="mb-8 scroll-mt-24 rounded-3xl border border-white/10 bg-white/[0.06] p-4 text-white shadow-2xl shadow-black/20 backdrop-blur-xl transition-shadow duration-300 hover:shadow-card-hover">
         <div className="flex flex-wrap items-end gap-5">
-          {/* Size pills */}
-          <div>
-            <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-neutral-400">
+          <div className="min-w-full">
+            <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-white/45">
               Categoria
             </p>
-            <select
-              value={categoryFilter}
-              onChange={(e) => setCategoryFilter(e.target.value)}
-              className="input-field w-44"
-            >
-              <option value="">Todas</option>
+            <div className="flex flex-wrap gap-1.5">
+              <button
+                type="button"
+                onClick={() => setCategoryFilter("")}
+                className={`rounded-full px-4 py-2 text-sm font-black transition-all duration-150 ${
+                  !categoryFilter
+                    ? "bg-yellow-400 text-neutral-950 shadow-sm"
+                    : "bg-white/10 text-white/75 hover:bg-white/15 hover:text-white"
+                }`}
+              >
+                Todas
+              </button>
               {categories.map((category) => (
-                <option key={category} value={category}>
+                <button
+                  key={category}
+                  type="button"
+                  onClick={() =>
+                    setCategoryFilter(categoryFilter === category ? "" : category)
+                  }
+                  className={`rounded-full px-4 py-2 text-sm font-black transition-all duration-150 ${
+                    categoryFilter === category
+                      ? "bg-yellow-400 text-neutral-950 shadow-sm"
+                      : "bg-white/10 text-white/75 hover:bg-white/15 hover:text-white"
+                  }`}
+                >
                   {category}
-                </option>
+                </button>
               ))}
-            </select>
+            </div>
           </div>
 
           {/* Size pills */}
           <div>
-            <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-neutral-400">
+            <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-white/45">
               Tamanho
             </p>
             <div className="flex gap-1.5">
@@ -148,7 +193,7 @@ export default function Catalog({ settings }) {
                 className={`rounded-lg px-3 py-1.5 text-sm font-semibold transition-all duration-150 ${
                   !sizeFilter
                     ? "bg-yellow-400 text-neutral-900 shadow-sm"
-                    : "bg-yellow-50 text-neutral-700 hover:bg-yellow-100"
+                    : "bg-white/10 text-white/75 hover:bg-white/15 hover:text-white"
                 }`}
               >
                 Todos
@@ -160,7 +205,7 @@ export default function Catalog({ settings }) {
                   className={`rounded-lg px-3 py-1.5 text-sm font-semibold transition-all duration-150 ${
                     sizeFilter === s
                       ? "bg-yellow-400 text-neutral-900 shadow-sm"
-                      : "bg-yellow-50 text-neutral-700 hover:bg-yellow-100"
+                      : "bg-white/10 text-white/75 hover:bg-white/15 hover:text-white"
                   }`}
                 >
                   {s}
@@ -171,11 +216,11 @@ export default function Catalog({ settings }) {
 
           {/* Price */}
           <div>
-            <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-neutral-400">
+            <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-white/45">
               Preço máximo
             </p>
             <div className="relative">
-              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-neutral-400">
+              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-neutral-500">
                 R$
               </span>
               <input
@@ -191,7 +236,7 @@ export default function Catalog({ settings }) {
 
           {/* Sort */}
           <div>
-            <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-neutral-400">
+            <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-white/45">
               Ordenar
             </p>
             <select
@@ -212,7 +257,7 @@ export default function Catalog({ settings }) {
                 setSizeFilter("");
                 setMaxPrice("");
               }}
-              className="ml-auto flex items-center gap-1 text-sm font-medium text-yellow-600 transition-colors hover:text-yellow-700"
+              className="ml-auto flex items-center gap-1 text-sm font-medium text-yellow-300 transition-colors hover:text-yellow-200"
             >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5">
                 <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
@@ -238,7 +283,7 @@ export default function Catalog({ settings }) {
 
       {/* Grid */}
       {loading ? (
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className={PRODUCT_GRID_CLASS}>
           {Array.from({ length: 6 }).map((_, i) => (
             <SkeletonCard key={i} />
           ))}
@@ -250,26 +295,26 @@ export default function Catalog({ settings }) {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -10, scale: 0.98 }}
           transition={{ duration: 0.25, ease: "easeOut" }}
-          className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-neutral-200 bg-white py-16 text-center"
+          className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/15 bg-white/[0.06] py-16 text-center text-white backdrop-blur"
         >
           <span className="mb-3 text-5xl">👕</span>
-          <p className="font-semibold text-neutral-700">Nenhum produto encontrado</p>
-          <p className="mt-1 text-sm text-neutral-400">Tente ajustar os filtros acima</p>
+          <p className="font-semibold text-white">Nenhum produto encontrado</p>
+          <p className="mt-1 text-sm text-white/45">Tente ajustar os filtros acima</p>
         </motion.div>
       ) : (
         <LayoutGroup>
           <motion.div
             layout
-            className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
-            transition={{ layout: { type: "spring", stiffness: 90, damping: 20, mass: 0.9 } }}
+            className={PRODUCT_GRID_CLASS}
+            transition={{ layout: PRODUCT_LAYOUT_TRANSITION }}
           >
-            <AnimatePresence initial={false}>
+            <AnimatePresence initial>
               {filtered.map((product, i) => (
                 <ProductCard
                   key={product._id}
                   product={product}
                   onDetails={() => setSelectedProduct(product)}
-                  animDelay={Math.min(i * 55, 320)}
+                  animDelay={Math.min(i * 18, 110)}
                 />
               ))}
             </AnimatePresence>
@@ -299,23 +344,24 @@ function ProductCard({ product, onDetails, animDelay = 0 }) {
     : [];
   const rating = 4.8;
   const reviewCount = Math.max(12, product.stock + 18);
+  const categories = product.categories?.length ? product.categories : [product.category || "Camisetas"];
 
   return (
     <motion.article
-      layout="position"
-      initial={{ opacity: 0, y: 28, scale: 0.96, filter: "blur(6px)" }}
+      layout
+      initial={{ opacity: 0, y: 18, scale: 0.96, filter: "blur(6px)" }}
       animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-      exit={{ opacity: 0, y: 20, scale: 0.94, filter: "blur(6px)" }}
+      exit={{ opacity: 0, y: 10, scale: 0.97, filter: "blur(4px)" }}
       transition={{
-        opacity: { duration: 0.34, delay: animDelay / 1000 },
-        y: { type: "spring", stiffness: 95, damping: 18, delay: animDelay / 1000 },
-        scale: { duration: 0.38, delay: animDelay / 1000, ease: [0.22, 1, 0.36, 1] },
-        filter: { duration: 0.3, delay: animDelay / 1000 },
-        layout: { type: "spring", stiffness: 75, damping: 18, mass: 1 },
+        opacity: { duration: 0.2, delay: animDelay / 1000, ease: "easeOut" },
+        y: { type: "spring", stiffness: 280, damping: 28, delay: animDelay / 1000 },
+        scale: { duration: 0.2, delay: animDelay / 1000, ease: [0.16, 1, 0.3, 1] },
+        filter: { duration: 0.16, delay: animDelay / 1000 },
+        layout: PRODUCT_LAYOUT_TRANSITION,
       }}
       className="group flex flex-col overflow-hidden rounded-2xl border border-neutral-100 bg-white text-neutral-900 shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover"
     >
-      <div className="relative aspect-[3/4] overflow-hidden bg-neutral-100">
+      <div className="relative aspect-[4/5] overflow-hidden bg-neutral-100">
         {images.length > 0 ? (
           <motion.img
             src={images[0]}
@@ -335,8 +381,13 @@ function ProductCard({ product, onDetails, animDelay = 0 }) {
         <div className="absolute left-3 top-3 flex flex-col gap-2">
           <div className="inline-flex items-center gap-1 rounded-full bg-yellow-400 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-neutral-900 shadow-sm">
             <Tag className="h-3 w-3" />
-            {product.category || "Camisetas"}
+            {categories[0]}
           </div>
+          {categories.length > 1 && (
+            <div className="rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-bold text-neutral-700 shadow-sm">
+              +{categories.length - 1} categoria{categories.length > 2 ? "s" : ""}
+            </div>
+          )}
           {lowStock && (
             <div className="rounded-full bg-amber-500 px-2.5 py-1 text-[11px] font-bold text-white shadow-sm">
               Últimas {product.stock}
@@ -350,8 +401,8 @@ function ProductCard({ product, onDetails, animDelay = 0 }) {
             e.stopPropagation();
             setIsWishlisted((value) => !value);
           }}
-          className={`absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/85 shadow-sm backdrop-blur transition-all duration-200 hover:bg-yellow-50 ${
-            isWishlisted ? "text-yellow-600" : "text-neutral-600"
+          className={`absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-neutral-950/65 shadow-sm backdrop-blur transition-all duration-200 hover:bg-neutral-900 ${
+            isWishlisted ? "text-yellow-300" : "text-white/75"
           }`}
           aria-label={isWishlisted ? "Remover dos favoritos" : "Adicionar aos favoritos"}
         >
@@ -434,9 +485,11 @@ function ProductDetailsModal({ product, onClose, onAdd }) {
   const outOfStock = product.stock <= 0;
   const hasSizes = product.sizes?.length > 0;
   const hasColors = product.colors?.length > 0;
+  const categories = product.categories?.length ? product.categories : [product.category || "Produto"];
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
+    document.body.classList.add("product-modal-open");
     let active = true;
 
     async function loadReviews() {
@@ -462,6 +515,7 @@ function ProductDetailsModal({ product, onClose, onAdd }) {
     return () => {
       active = false;
       document.body.style.overflow = "";
+      document.body.classList.remove("product-modal-open");
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [onClose, product._id]);
@@ -509,7 +563,7 @@ function ProductDetailsModal({ product, onClose, onAdd }) {
 
   return (
     <div
-      className="fixed inset-0 z-[80] flex items-center justify-center bg-neutral-950/55 p-3 backdrop-blur-sm animate-fade-in"
+      className="fixed inset-0 z-[999] flex items-center justify-center bg-black/80 p-3 backdrop-blur-sm animate-fade-in"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) onClose();
       }}
@@ -518,12 +572,12 @@ function ProductDetailsModal({ product, onClose, onAdd }) {
         initial={{ opacity: 0, y: 24, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.22 }}
-        className="relative max-h-[92vh] w-full max-w-5xl overflow-hidden rounded-3xl bg-white shadow-2xl"
+        className="relative max-h-[92vh] w-full max-w-5xl overflow-hidden rounded-3xl border border-white/10 bg-neutral-950 text-white shadow-2xl shadow-black/70 2xl:max-w-6xl min-[1800px]:max-w-7xl"
       >
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-neutral-500 shadow-sm transition-colors hover:bg-yellow-50 hover:text-neutral-900"
+          className="absolute right-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-neutral-900 text-white/60 shadow-sm transition-colors hover:bg-yellow-400 hover:text-neutral-950"
           aria-label="Fechar detalhes do produto"
         >
           <X className="h-5 w-5" />
@@ -531,8 +585,8 @@ function ProductDetailsModal({ product, onClose, onAdd }) {
 
         <div className="max-h-[92vh] overflow-y-auto">
           <div className="grid gap-0 lg:grid-cols-[1.08fr_0.92fr]">
-            <div className="bg-neutral-50 p-4 md:p-6">
-              <div className="overflow-hidden rounded-2xl border border-neutral-100 bg-white">
+            <div className="bg-neutral-950 p-4 md:p-6">
+              <div className="overflow-hidden rounded-2xl border border-white/10 bg-neutral-900">
                 {selectedImage ? (
                   <img
                     src={selectedImage}
@@ -540,7 +594,7 @@ function ProductDetailsModal({ product, onClose, onAdd }) {
                     className="aspect-[4/5] w-full object-cover"
                   />
                 ) : (
-                  <div className="flex aspect-[4/5] items-center justify-center bg-yellow-50">
+                  <div className="flex aspect-[4/5] items-center justify-center bg-white/[0.06]">
                     <img src="/logo.png" alt="" className="h-32 w-auto opacity-40 grayscale" />
                   </div>
                 )}
@@ -552,10 +606,10 @@ function ProductDetailsModal({ product, onClose, onAdd }) {
                       key={`${imageUrl}-${index}`}
                       type="button"
                       onClick={() => setSelectedImage(imageUrl)}
-                      className={`overflow-hidden rounded-xl border bg-white transition ${
+                      className={`overflow-hidden rounded-xl border bg-neutral-900 transition ${
                         selectedImage === imageUrl
-                          ? "border-yellow-400 ring-2 ring-yellow-100"
-                          : "border-neutral-100 hover:border-yellow-200"
+                          ? "border-yellow-400 ring-2 ring-yellow-400/20"
+                          : "border-white/10 hover:border-yellow-300/60"
                       }`}
                       aria-label={`Ver imagem ${index + 1} de ${product.name}`}
                     >
@@ -571,9 +625,16 @@ function ProductDetailsModal({ product, onClose, onAdd }) {
             </div>
 
             <div className="p-5 md:p-7">
-              <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-yellow-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-yellow-700">
-                <Tag className="h-3.5 w-3.5" />
-                {product.category || "Produto"}
+              <div className="mb-3 flex flex-wrap gap-2">
+                {categories.map((category) => (
+                  <span
+                    key={category}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-yellow-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-yellow-700"
+                  >
+                    <Tag className="h-3.5 w-3.5" />
+                    {category}
+                  </span>
+                ))}
               </div>
 
               <h2 className="text-2xl font-bold leading-tight text-neutral-950 md:text-3xl">
@@ -606,7 +667,7 @@ function ProductDetailsModal({ product, onClose, onAdd }) {
               </div>
 
               {product.description && (
-                <div className="mt-6 rounded-2xl border border-neutral-100 bg-neutral-50 p-4">
+              <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.06] p-4">
                   <p className="text-sm font-semibold text-neutral-900">Descrição</p>
                   <p className="mt-2 text-sm leading-relaxed text-neutral-600">{product.description}</p>
                 </div>
@@ -656,7 +717,7 @@ function ProductDetailsModal({ product, onClose, onAdd }) {
                           className={`flex h-10 min-w-12 items-center justify-center rounded-xl px-3 text-sm font-bold transition-colors ${
                             size === s
                               ? "bg-yellow-400 text-neutral-950"
-                              : "border border-neutral-200 bg-white text-neutral-600 hover:border-yellow-300 hover:bg-yellow-50"
+                              : "border border-white/10 bg-white/[0.06] text-white/70 hover:border-yellow-300/60 hover:bg-white/[0.1]"
                           }`}
                         >
                           {s}
@@ -668,21 +729,21 @@ function ProductDetailsModal({ product, onClose, onAdd }) {
 
                 <div>
                   <p className="mb-2 text-sm font-semibold text-neutral-900">Quantidade</p>
-                  <div className="inline-flex items-center overflow-hidden rounded-xl border border-neutral-200">
+                  <div className="inline-flex items-center overflow-hidden rounded-xl border border-white/10 bg-white/[0.04]">
                     <button
                       type="button"
                       onClick={() => setQuantity((value) => Math.max(1, value - 1))}
-                      className="flex h-10 w-10 items-center justify-center text-neutral-500 hover:bg-yellow-50"
+                      className="flex h-10 w-10 items-center justify-center text-white/55 hover:bg-white/[0.08] hover:text-white"
                     >
                       -
                     </button>
-                    <span className="flex h-10 min-w-12 items-center justify-center border-x border-neutral-200 text-sm font-bold">
+                    <span className="flex h-10 min-w-12 items-center justify-center border-x border-white/10 text-sm font-bold text-white">
                       {quantity}
                     </span>
                     <button
                       type="button"
                       onClick={() => setQuantity((value) => Math.min(product.stock || 1, value + 1))}
-                      className="flex h-10 w-10 items-center justify-center text-neutral-500 hover:bg-yellow-50"
+                      className="flex h-10 w-10 items-center justify-center text-white/55 hover:bg-white/[0.08] hover:text-white"
                     >
                       +
                     </button>
@@ -690,7 +751,7 @@ function ProductDetailsModal({ product, onClose, onAdd }) {
                 </div>
               </div>
 
-              <div className="mt-6 rounded-2xl border border-neutral-100 bg-white p-4 shadow-sm">
+              <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.06] p-4 shadow-sm">
                 <p className="text-sm font-semibold text-neutral-900">
                   {outOfStock ? "Produto esgotado" : `${product.stock} unidades disponíveis`}
                 </p>
@@ -707,9 +768,9 @@ function ProductDetailsModal({ product, onClose, onAdd }) {
                   isAdding
                     ? "bg-yellow-300 text-neutral-900"
                     : added
-                    ? "bg-neutral-900 text-white"
+                    ? "bg-white text-neutral-950"
                     : outOfStock
-                    ? "cursor-not-allowed bg-neutral-100 text-neutral-400"
+                    ? "cursor-not-allowed bg-white/[0.08] text-white/35"
                     : "bg-yellow-400 text-neutral-950 hover:bg-yellow-500"
                 }`}
               >
@@ -735,7 +796,7 @@ function ProductDetailsModal({ product, onClose, onAdd }) {
             </div>
           </div>
 
-          <div id="produto-avaliacoes" className="border-t border-neutral-100 bg-white p-5 md:p-7">
+          <div id="produto-avaliacoes" className="border-t border-white/10 bg-neutral-900 p-5 md:p-7">
             <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
               <div>
                 <h3 className="text-xl font-bold text-neutral-950">Avaliações do produto</h3>
@@ -743,7 +804,7 @@ function ProductDetailsModal({ product, onClose, onAdd }) {
                   Conte para outros clientes o que achou desse manto.
                 </p>
 
-                <form onSubmit={handleReviewSubmit} className="mt-4 space-y-3 rounded-2xl border border-neutral-100 bg-neutral-50 p-4">
+                <form onSubmit={handleReviewSubmit} className="mt-4 space-y-3 rounded-2xl border border-white/10 bg-white/[0.05] p-4">
                   <input
                     value={reviewForm.name}
                     onChange={(event) => setReviewForm((form) => ({ ...form, name: event.target.value }))}
@@ -800,16 +861,16 @@ function ProductDetailsModal({ product, onClose, onAdd }) {
 
               <div className="space-y-3">
                 {reviewsLoading ? (
-                  <div className="rounded-2xl border border-neutral-100 bg-white p-6 text-center text-sm text-neutral-400">
+                  <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-6 text-center text-sm text-white/45">
                     Carregando avaliações...
                   </div>
                 ) : reviews.length === 0 ? (
-                  <div className="rounded-2xl border border-dashed border-neutral-200 bg-white p-6 text-center text-sm text-neutral-500">
+                  <div className="rounded-2xl border border-dashed border-white/15 bg-white/[0.05] p-6 text-center text-sm text-white/50">
                     Ainda não há avaliações. Seja o primeiro cliente a avaliar.
                   </div>
                 ) : (
                   reviews.map((review) => (
-                    <div key={review._id} className="rounded-2xl border border-neutral-100 bg-white p-4 shadow-sm">
+                    <div key={review._id} className="rounded-2xl border border-white/10 bg-white/[0.05] p-4 shadow-sm">
                       <div className="flex items-start justify-between gap-3">
                         <div>
                           <p className="font-semibold text-neutral-900">{review.customerName}</p>

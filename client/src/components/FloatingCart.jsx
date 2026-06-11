@@ -29,7 +29,7 @@ export default function FloatingCart() {
     <Link
       to="/carrinho"
       aria-label={`Abrir carrinho com ${count} ${count === 1 ? "item" : "itens"}`}
-      className="fixed bottom-5 right-5 z-[60] flex items-center gap-3 rounded-full border border-yellow-300 bg-yellow-400 px-4 py-3 font-semibold text-neutral-900 shadow-[0_18px_50px_-18px_rgba(23,23,23,0.55)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-yellow-500 hover:shadow-[0_22px_55px_-18px_rgba(23,23,23,0.65)] active:scale-[0.98] sm:bottom-8 sm:right-8"
+      className="storefront-floating-cart fixed bottom-5 right-5 z-[60] flex items-center gap-3 rounded-full border border-yellow-300 bg-yellow-400 px-4 py-3 font-semibold text-neutral-900 shadow-[0_18px_50px_-18px_rgba(23,23,23,0.55)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-yellow-500 hover:shadow-[0_22px_55px_-18px_rgba(23,23,23,0.65)] active:scale-[0.98] sm:bottom-8 sm:right-8"
     >
       <span className="relative flex h-11 w-11 items-center justify-center rounded-full bg-white text-neutral-900 shadow-inner-sm">
         <IconBag />

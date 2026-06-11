@@ -109,7 +109,11 @@ export default function Cart() {
               <div className="min-w-0 flex-1">
                 <p className="truncate font-semibold text-neutral-900">{item.name}</p>
                 <p className="mt-0.5 text-xs text-neutral-400">
-                  {[item.category, item.size && `Tam. ${item.size}`, item.color]
+                  {[
+                    ...(item.categories?.length ? item.categories : [item.category]).filter(Boolean),
+                    item.size && `Tam. ${item.size}`,
+                    item.color,
+                  ]
                     .filter(Boolean)
                     .join(" · ")}
                 </p>

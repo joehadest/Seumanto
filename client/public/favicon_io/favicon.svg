@@ -1,0 +1,19 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="mark" x1="53" y1="24" x2="87" y2="98" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FDE68A"/>
+      <stop offset="0.48" stop-color="#FACC15"/>
+      <stop offset="1" stop-color="#EAB308"/>
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0.98 0 1 0 0 0.8 0 0 1 0 0.08 0 0 0 0.55 0"/>
+      <feBlend in="SourceGraphic"/>
+    </filter>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="#171717"/>
+  <g filter="url(#glow)">
+    <path d="M55.8 16.8C61.6 9.1 72.6 7.5 80.3 13.3L104.2 31.1C109.6 35.1 112.5 41.7 111.7 48.3L107.7 80.7C106.9 87.5 102.2 93.2 95.7 95.5L66 105.9C59.7 108.1 52.8 106.7 47.8 102.2L24.2 80.6C19.4 76.1 17.3 69.4 18.8 63L26.2 31.8C27.5 26.3 31.4 21.6 36.5 19.2L55.8 16.8Z" fill="#101010" stroke="#FACC15" stroke-width="4"/>
+    <path d="M78.9 39.1C73.9 36.8 68.5 35.5 62.9 35.5C50.7 35.5 43.3 41.8 43.3 51C43.3 61.6 52.6 65.2 64.1 68.2C72.1 70.2 75.2 72 75.2 75.6C75.2 79.2 71.6 81.4 65.7 81.4C59.1 81.4 52.1 79.1 46.2 75.6L40.7 88.5C46.8 92.5 55.9 94.9 65 94.9C78.6 94.9 88 88.5 88 76.8C88 66.6 81.1 62 67.1 58.4C58.9 56.3 55.9 54.9 55.9 51.7C55.9 48.7 59.1 46.9 64.5 46.9C70 46.9 75.3 48.3 80.2 50.7L78.9 39.1Z" fill="url(#mark)"/>
+  </g>
+</svg>

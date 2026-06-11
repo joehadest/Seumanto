@@ -74,8 +74,8 @@ export default function InteractiveSelector({
   }, [safeItems.length]);
 
   return (
-    <section className="mb-10 overflow-hidden rounded-[2rem] border border-neutral-100 bg-neutral-950 p-4 text-white shadow-card md:p-6">
-      <div className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
+    <section className="relative left-1/2 mb-10 w-screen -translate-x-1/2 overflow-hidden bg-neutral-950 px-4 pb-8 pt-0 text-white md:px-8 md:pb-10">
+      <div className="relative mx-auto grid max-w-6xl gap-6 pt-0 lg:grid-cols-[0.8fr_1.2fr] lg:items-end 2xl:max-w-screen-2xl min-[1800px]:max-w-[1760px]">
         <div className="px-1 py-3 md:px-3">
           <p className="text-xs font-black uppercase tracking-[0.28em] text-yellow-300">
             {eyebrow}
@@ -99,11 +99,12 @@ export default function InteractiveSelector({
           )}
         </div>
 
-        <div className="flex h-[420px] min-w-0 gap-2 overflow-hidden rounded-[1.5rem] bg-neutral-900 p-2 max-sm:h-auto max-sm:flex-col">
+        <div className="flex h-[420px] min-w-0 gap-2 overflow-hidden rounded-[1.5rem] bg-black/25 p-2 ring-1 ring-white/10 max-sm:h-auto max-sm:flex-col">
           {safeItems.map((item, index) => {
             const isActive = activeIndex === index;
             const Icon = FALLBACK_ICONS[index % FALLBACK_ICONS.length];
             const coverImage = item.imageUrls?.[0] ?? item.imageUrl;
+            const category = item.categories?.[0] ?? item.category;
 
             return (
               <button
@@ -146,6 +147,11 @@ export default function InteractiveSelector({
                     <span className="block truncate text-lg font-black leading-tight">
                       {item.name}
                     </span>
+                    {category && (
+                      <span className="mt-0.5 block truncate text-xs font-black uppercase tracking-[0.18em] text-yellow-300">
+                        {category}
+                      </span>
+                    )}
                     <span className="mt-0.5 block truncate text-sm text-white/70">
                       {item.description}
                     </span>

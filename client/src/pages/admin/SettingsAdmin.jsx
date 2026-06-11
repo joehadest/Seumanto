@@ -216,7 +216,7 @@ export default function SettingsAdmin() {
           <StatusPill active={!form.maintenanceMode} />
         </div>
 
-        <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4 min-[1800px]:grid-cols-6">
           <SummaryMetric
             icon={Store}
             label="Nome público"
@@ -246,7 +246,7 @@ export default function SettingsAdmin() {
         </div>
       )}
 
-      <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
+      <div className="grid gap-6 xl:grid-cols-[1fr_360px] 2xl:grid-cols-[1fr_420px] min-[1800px]:grid-cols-[1fr_480px]">
         <form onSubmit={handleSubmit} className="space-y-5">
           <SettingsSection
             icon={Store}

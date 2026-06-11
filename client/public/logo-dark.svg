@@ -1,0 +1,21 @@
+<svg width="360" height="150" viewBox="0 0 360 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0.98 0 1 0 0 0.8 0 0 1 0 0.08 0 0 0 0.45 0"/>
+      <feBlend in="SourceGraphic"/>
+    </filter>
+    <linearGradient id="mark" x1="74" y1="21" x2="119" y2="101" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FDE68A"/>
+      <stop offset="0.48" stop-color="#FACC15"/>
+      <stop offset="1" stop-color="#EAB308"/>
+    </linearGradient>
+  </defs>
+  <rect width="360" height="150" rx="36" fill="transparent"/>
+  <g filter="url(#glow)">
+    <path d="M78.8 26.1C84.9 17.7 96.7 15.9 105.1 22L130.6 40.6C136.4 44.8 139.5 51.8 138.6 58.9L134.3 93.5C133.4 100.8 128.4 107 121.5 109.4L89.8 120.5C83.1 122.9 75.7 121.4 70.4 116.6L45.2 93.6C40 88.9 37.8 81.8 39.4 75L47.3 41.7C48.7 35.8 52.8 30.8 58.3 28.2L78.8 26.1Z" fill="#101010" stroke="#FACC15" stroke-width="3.5"/>
+    <path d="M103.8 48.8C98.5 46.3 92.7 44.9 86.7 44.9C73.7 44.9 65.8 51.6 65.8 61.4C65.8 72.7 75.7 76.6 87.9 79.7C96.4 81.9 99.7 83.8 99.7 87.6C99.7 91.5 95.9 93.8 89.6 93.8C82.5 93.8 75.1 91.4 68.8 87.6L62.9 101.4C69.4 105.7 79.1 108.2 88.8 108.2C103.3 108.2 113.3 101.4 113.3 88.9C113.3 78.1 106 73.2 91.1 69.4C82.4 67.2 79.2 65.7 79.2 62.3C79.2 59.1 82.6 57.2 88.3 57.2C94.2 57.2 99.8 58.7 105 61.3L103.8 48.8Z" fill="url(#mark)"/>
+  </g>
+  <text x="155" y="71" fill="#FFFFFF" font-family="Trebuchet MS, Arial Rounded MT Bold, Arial, sans-serif" font-size="42" letter-spacing="-2.8" font-weight="400">Seu manto</text>
+  <text x="158" y="96" fill="#FACC15" font-family="Arial, sans-serif" font-size="10" letter-spacing="4.4" font-weight="800">PRODUTOS ESSENCIAIS</text>
+</svg>

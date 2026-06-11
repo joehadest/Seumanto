@@ -71,10 +71,10 @@ export default function Login() {
 
   if (checking) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-white px-4">
+      <div className="admin-dark flex min-h-screen items-center justify-center bg-neutral-950 px-4 text-white">
         <div className="card w-full max-w-md p-8 text-center">
           <div className="skeleton mx-auto mb-4 h-12 w-12 rounded-full" />
-          <p className="text-sm font-medium text-neutral-500">Verificando sessao...</p>
+          <p className="text-sm font-medium text-white/50">Verificando sessão...</p>
         </div>
       </div>
     );
@@ -83,12 +83,13 @@ export default function Login() {
   if (authorized) return <Navigate to={from} replace />;
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-white px-4 animate-fade-in">
+    <div className="admin-dark relative flex min-h-screen items-center justify-center overflow-hidden bg-neutral-950 px-4 text-white animate-fade-in">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-80 bg-[radial-gradient(circle_at_50%_0%,rgba(250,204,21,0.16),transparent_36%)]" />
       <div className="w-full max-w-md">
         <div className="mb-6 text-center">
           <Link to="/" className="inline-flex flex-col items-center gap-3">
-            <img src="/logo.png" alt="Seu manto" className="h-24 w-auto" />
-            <span className="text-sm font-medium text-neutral-500">Painel administrativo</span>
+            <img src="/logo-dark.svg" alt="Seu manto" className="h-28 w-auto" />
+            <span className="text-sm font-medium text-white/55">Painel administrativo</span>
           </Link>
         </div>
 
