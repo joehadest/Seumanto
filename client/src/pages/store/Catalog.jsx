@@ -577,10 +577,10 @@ function ProductDetailsModal({ product, onClose, onAdd }) {
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-neutral-900 text-white/60 shadow-sm transition-colors hover:bg-yellow-400 hover:text-neutral-950"
+          className="absolute right-5 top-5 z-20 flex h-11 w-11 items-center justify-center rounded-full border border-yellow-300/40 bg-neutral-950/90 text-white shadow-[0_8px_30px_rgba(0,0,0,0.45)] backdrop-blur-md transition-all duration-200 hover:scale-105 hover:border-yellow-300 hover:bg-yellow-400 hover:text-neutral-950 hover:shadow-[0_10px_35px_rgba(250,204,21,0.35)] active:scale-95"
           aria-label="Fechar detalhes do produto"
         >
-          <X className="h-5 w-5" />
+          <X className="h-5 w-5" strokeWidth={2.5} />
         </button>
 
         <div className="max-h-[92vh] overflow-y-auto">

@@ -212,7 +212,8 @@
 }
 
 body.product-modal-open .storefront-navbar,
-body.product-modal-open .storefront-floating-cart {
+body.product-modal-open .storefront-floating-cart,
+body.product-modal-open .storefront-footer {
   opacity: 0;
   pointer-events: none;
   transform: translateY(-10px);

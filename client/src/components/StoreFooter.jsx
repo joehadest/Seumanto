@@ -57,7 +57,7 @@ export default function StoreFooter({ settings }) {
   }
 
   return (
-    <footer className="relative mt-16 overflow-hidden border-t border-white/10 bg-neutral-950 text-white">
+    <footer className="storefront-footer relative mt-16 overflow-hidden border-t border-white/10 bg-neutral-950 text-white">
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:60px_60px] [mask-image:linear-gradient(to_bottom,transparent,black_20%,black_80%,transparent)]" />
       <div className="pointer-events-none absolute left-1/2 top-1/2 h-[420px] w-[680px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-yellow-300/15 blur-3xl animate-footer-breathe" />
 
