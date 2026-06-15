@@ -165,18 +165,18 @@ export default function MinhaConta() {
 
   return (
     <div className="mx-auto max-w-6xl animate-fade-in">
-      <div className="mb-6 overflow-hidden rounded-[2rem] border border-yellow-100 bg-gradient-to-br from-yellow-50 via-white to-white p-6 shadow-card">
+      <div className="mb-6 overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-yellow-400/15 via-white/[0.07] to-white/[0.04] p-6 shadow-2xl shadow-black/30 backdrop-blur-xl">
         <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-4">
             <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-neutral-950 text-2xl font-black text-yellow-300 shadow-lg shadow-neutral-950/15">
               {getInitials(preferences.nickname || form.name, email)}
             </div>
             <div>
-              <p className="text-xs font-black uppercase tracking-[0.22em] text-yellow-700">Área do cliente</p>
-              <h1 className="mt-1 text-3xl font-black tracking-tight text-neutral-950">
+              <p className="text-xs font-black uppercase tracking-[0.22em] text-yellow-300">Área do cliente</p>
+              <h1 className="mt-1 text-3xl font-black tracking-tight text-white">
                 {preferences.nickname || form.name || "Minha Conta"}
               </h1>
-              <p className="mt-1 text-sm text-neutral-500">{email}</p>
+              <p className="mt-1 text-sm text-white/55">{email}</p>
             </div>
           </div>
 
@@ -189,7 +189,7 @@ export default function MinhaConta() {
               type="button"
               onClick={handleLogout}
               disabled={leaving}
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-red-100 bg-white px-4 py-2 text-sm font-bold text-red-600 shadow-sm transition-colors hover:bg-red-50 disabled:opacity-60"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-red-400/25 bg-red-500/10 px-4 py-2 text-sm font-bold text-red-200 shadow-sm transition-colors hover:border-red-300/40 hover:bg-red-500/15 hover:text-red-100 disabled:opacity-60"
             >
               <LogOut className="h-4 w-4" />
               {leaving ? "Saindo..." : "Sair"}
@@ -205,7 +205,7 @@ export default function MinhaConta() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
-        <aside className="h-fit rounded-3xl border border-neutral-100 bg-white p-3 shadow-card">
+        <aside className="h-fit rounded-3xl border border-white/10 bg-white/[0.07] p-3 shadow-2xl shadow-black/25 backdrop-blur-xl">
           {sections.map((section) => {
             const Icon = section.icon;
             const active = activeSection === section.id;
@@ -216,8 +216,8 @@ export default function MinhaConta() {
                 onClick={() => setActiveSection(section.id)}
                 className={`mb-2 flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-bold transition-all last:mb-0 ${
                   active
-                    ? "bg-neutral-950 text-white shadow-sm"
-                    : "text-neutral-500 hover:bg-yellow-50 hover:text-neutral-950"
+                    ? "bg-yellow-400 text-neutral-950 shadow-sm"
+                    : "text-white/55 hover:bg-white/10 hover:text-white"
                 }`}
               >
                 <Icon className="h-4 w-4" />
@@ -322,11 +322,11 @@ export default function MinhaConta() {
             </section>
           )}
 
-          {error && <div className="mt-5 rounded-xl border border-red-100 bg-red-50 px-3 py-2.5 text-sm text-red-700">{error}</div>}
-          {message && <div className="mt-5 rounded-xl border border-emerald-100 bg-emerald-50 px-3 py-2.5 text-sm text-emerald-700">{message}</div>}
+          {error && <div className="mt-5 rounded-xl border border-red-400/25 bg-red-500/10 px-3 py-2.5 text-sm text-red-200">{error}</div>}
+          {message && <div className="mt-5 rounded-xl border border-emerald-400/25 bg-emerald-500/10 px-3 py-2.5 text-sm text-emerald-200">{message}</div>}
 
-          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-neutral-100 pt-5">
-            <p className="text-xs text-neutral-400">Suas alterações ficam salvas na sua conta Seu Manto.</p>
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-5">
+            <p className="text-xs text-white/45">Suas alterações ficam salvas na sua conta Seu Manto.</p>
             <button type="submit" disabled={saving} className="btn-primary gap-2">
               <Save className="h-4 w-4" />
               {saving ? "Salvando..." : "Salvar alterações"}
@@ -341,7 +341,7 @@ export default function MinhaConta() {
 function Field({ label, ...props }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-sm font-medium text-neutral-700">{label}</span>
+      <span className="mb-1.5 block text-sm font-medium text-white/70">{label}</span>
       <input {...props} className="input-field" />
     </label>
   );
@@ -350,7 +350,7 @@ function Field({ label, ...props }) {
 function SelectField({ label, options, ...props }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-sm font-medium text-neutral-700">{label}</span>
+      <span className="mb-1.5 block text-sm font-medium text-white/70">{label}</span>
       <select {...props} className="input-field">
         {options.map((option) => (
           <option key={option || "empty"} value={option}>
@@ -365,12 +365,12 @@ function SelectField({ label, options, ...props }) {
 function SectionHeader({ icon: Icon, title, description }) {
   return (
     <div className="mb-5 flex items-start gap-3">
-      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-yellow-50 text-yellow-700">
+      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-yellow-400/15 text-yellow-300">
         <Icon className="h-5 w-5" />
       </div>
       <div>
-        <h2 className="text-xl font-black text-neutral-950">{title}</h2>
-        <p className="mt-1 text-sm text-neutral-500">{description}</p>
+        <h2 className="text-xl font-black text-white">{title}</h2>
+        <p className="mt-1 text-sm text-white/50">{description}</p>
       </div>
     </div>
   );
@@ -378,29 +378,29 @@ function SectionHeader({ icon: Icon, title, description }) {
 
 function SummaryCard({ icon: Icon, label, value }) {
   return (
-    <div className="rounded-2xl border border-white bg-white/80 p-4 shadow-sm">
-      <Icon className="mb-2 h-5 w-5 text-yellow-600" />
-      <p className="text-xs font-black uppercase tracking-wider text-neutral-400">{label}</p>
-      <p className="mt-1 truncate text-sm font-bold text-neutral-900">{value}</p>
+    <div className="rounded-2xl border border-white/10 bg-neutral-950/35 p-4 shadow-sm">
+      <Icon className="mb-2 h-5 w-5 text-yellow-300" />
+      <p className="text-xs font-black uppercase tracking-wider text-white/40">{label}</p>
+      <p className="mt-1 truncate text-sm font-bold text-white/90">{value}</p>
     </div>
   );
 }
 
 function PreferenceCard({ icon: Icon, title, text }) {
   return (
-    <div className="rounded-2xl border border-yellow-100 bg-yellow-50 p-4">
-      <Icon className="mb-2 h-5 w-5 text-yellow-700" />
-      <p className="font-bold text-neutral-900">{title}</p>
-      <p className="mt-1 text-sm text-neutral-500">{text}</p>
+    <div className="rounded-2xl border border-yellow-300/20 bg-yellow-400/10 p-4">
+      <Icon className="mb-2 h-5 w-5 text-yellow-300" />
+      <p className="font-bold text-white">{title}</p>
+      <p className="mt-1 text-sm text-white/55">{text}</p>
     </div>
   );
 }
 
 function ToggleField({ icon: Icon, label, ...props }) {
   return (
-    <label className="flex cursor-pointer items-center justify-between gap-4 rounded-2xl border border-neutral-100 bg-neutral-50 p-4 transition-colors hover:bg-yellow-50">
-      <span className="flex items-center gap-3 text-sm font-bold text-neutral-800">
-        <Icon className="h-5 w-5 text-yellow-700" />
+    <label className="flex cursor-pointer items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.06] p-4 transition-colors hover:border-yellow-300/25 hover:bg-yellow-400/10">
+      <span className="flex items-center gap-3 text-sm font-bold text-white/85">
+        <Icon className="h-5 w-5 text-yellow-300" />
         {label}
       </span>
       <input type="checkbox" {...props} className="h-5 w-5 rounded border-neutral-300 text-yellow-400 focus:ring-yellow-200" />
